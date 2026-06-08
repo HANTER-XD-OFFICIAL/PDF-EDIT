@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD RASEL PDF STUDIO - Premium Futuristic Client-Side PDF Suite</title>
+    
+    <!-- CDNs for Styling & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Frontend Client-Side Libraries -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        neon: {
+                            cyan: '#06b6d4',
+                            purple: '#a855f7',
+                            pink: '#ec4899',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.15);
+        }
+
+        /* Glowing Effects */
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+        
+        .glow-purple {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+        }
+
+        /* Particles CSS Animation */
+        @keyframes float-particle {
+            0% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0; }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.4; }
+            100% { transform: translateY(-100vh) translateX(50px) scale(0.8); opacity: 0; }
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.4) 0%, rgba(168, 85, 247, 0) 70%);
+            border-radius: 50%;
+            animation: float-particle 15s linear infinite;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(6, 182, 212, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(6, 182, 212, 0.6);
+        }
+
+        /* Splash Screen Fade Out */
+        .splash-fade {
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.8s ease;
+        }
+
+        /* Keyboard Shortcut Hint Tag Style */
+        .kbd-key {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col relative antialiased overflow-y-auto">
+
+    <!-- FLOATING NEON PARTICLES BACKGROUND -->
+    <div id="particles-container" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <!-- SPLASH SCREEN LAYER -->
+    <div id="splash-screen" class="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center transition-all duration-1000">
+        <div class="text-center">
+            <div class="relative inline-block mb-6">
+                <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-cyan-500 to-purple-600 animate-spin opacity-20 blur-xl absolute inset-0"></div>
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-cyan-500 to-purple-500 flex items-center justify-center shadow-lg shadow-cyan-500/20 relative z-10 border border-white/20">
+                    <i class="fa-solid fa-file-pdf text-4xl text-white animate-pulse"></i>
+                </div>
+            </div>
+            <h1 class="font-display text-3xl font-bold tracking-wider text-white bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">MD RASEL PDF STUDIO</h1>
+            <p class="text-slate-400 text-sm tracking-widest uppercase mt-2">Next-Gen Web OS PDF Engine</p>
+            <div class="w-48 h-1 bg-slate-800 rounded-full mt-6 mx-auto overflow-hidden relative">
+                <div class="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-400 to-purple-500 w-1/2 rounded-full animate-[loading_2s_infinite_linear]" style="animation: splashLoad 1.5s infinite ease-in-out;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes splashLoad {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(200%); }
+        }
+    </style>
+
+    <!-- DYNAMIC TOAST NOTIFICATIONS CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3"></div>
+
+    <!-- MAIN DASHBOARD CONTENT GRID -->
+    <div class="flex-1 flex flex-col md:flex-row z-10 min-h-screen">
+        
+        <!-- SIDEBAR NAVIGATION PANEL -->
+        <aside class="w-full md:w-80 glass-panel border-r border-white/10 flex flex-col shrink-0">
+            <!-- Branding Header -->
+            <div class="p-6 border-b border-white/10 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-purple-500 flex items-center justify-center shadow-md shadow-cyan-500/10">
+                        <i class="fa-solid fa-cubes text-lg text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-display font-bold tracking-tight text-white leading-none">MD RASEL</h2>
+                        <span class="text-[10px] text-cyan-400 font-semibold tracking-wider uppercase">PDF Studio Pro</span>
+                    </div>
+                </div>
+                <div id="theme-indicator" class="w-8 h-8 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center cursor-pointer hover:border-cyan-400 transition" onclick="toggleTheme()">
+                    <i class="fa-solid fa-moon text-cyan-400 text-sm"></i>
+                </div>
+            </div>
+
+            <!-- Main Menu Navigation Tabs -->
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <div class="text-[10px] text-slate-500 font-bold uppercase tracking-widest px-3 mb-2">Core Tools</div>
+                
+                <button onclick="switchTab('dashboard-tab')" id="btn-dashboard-tab" class="nav-tab active-tab w-full flex items-center justify-between px-4 py-3 rounded-xl transition text-left text-sm bg-gradient-to-r from-cyan-500/10 to-transparent border-l-4 border-cyan-400 text-cyan-400">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-chart-pie text-base"></i>
+                        <span>Studio Dashboard</span>
+                    </div>
+                    <span class="text-xs px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 font-semibold border border-cyan-500/20">Active</span>
+                </button>
+
+                <button onclick="switchTab('editor-tab')" id="btn-editor-tab" class="nav-tab w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left text-sm text-slate-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent">
+                    <i class="fa-solid fa-pen-nib text-base text-purple-400"></i>
+                    <span>PDF Interactive Editor</span>
+                </button>
+
+                <button onclick="switchTab('converter-tab')" id="btn-converter-tab" class="nav-tab w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left text-sm text-slate-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent">
+                    <i class="fa-solid fa-images text-base text-pink-400"></i>
+                    <span>PDF to PNG Converter</span>
+                </button>
+
+                <div class="text-[10px] text-slate-500 font-bold uppercase tracking-widest px-3 pt-6 mb-2">Workspace</div>
+                
+                <!-- Recent Files Feed -->
+                <div class="px-3 py-2 text-xs text-slate-400 font-medium">Recent Files</div>
+                <div id="recent-files-list" class="space-y-1.5 px-1 max-h-48 overflow-y-auto">
+                    <!-- Dynamic List Populated Via LocalStorage -->
+                    <div class="text-[11px] text-slate-500 italic p-2 text-center">No recent files in cache.</div>
+                </div>
+
+                <div class="text-[10px] text-slate-500 font-bold uppercase tracking-widest px-3 pt-6 mb-2">Preferences</div>
+                
+                <!-- Language Selector Mock Option -->
+                <div class="px-3 flex items-center justify-between text-xs text-slate-400">
+                    <span>Language</span>
+                    <select id="lang-select" onchange="changeLanguage()" class="bg-slate-900 border border-white/10 text-xs text-slate-300 rounded px-2 py-1 outline-none focus:border-cyan-400">
+                        <option value="en">English (US)</option>
+                        <option value="es">Español</option>
+                        <option value="bn">বাংলা (Bengali)</option>
+                    </select>
+                </div>
+            </nav>
+
+            <!-- Sticky Sidebar Footer -->
+            <div class="p-4 border-t border-white/10 glass-panel bg-slate-950/80">
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Client Cloud OS Engine
+                    </span>
+                    <span class="font-semibold text-slate-300">v2.1</span>
+                </div>
+                <div class="mt-3 flex gap-2">
+                    <button onclick="openKeyboardShortcuts()" class="flex-1 py-1.5 bg-slate-900 hover:bg-slate-800 text-[11px] text-slate-300 border border-white/5 rounded-lg transition">
+                        <i class="fa-solid fa-keyboard mr-1"></i> Shortcuts
+                    </button>
+                    <button onclick="clearCache()" class="py-1.5 px-3 bg-red-950/20 hover:bg-red-950/40 text-[11px] text-red-400 border border-red-500/10 rounded-lg transition" title="Clear Workspace Cache">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN INTERACTIVE VIEWPORT CONTAINER -->
+        <main class="flex-1 flex flex-col overflow-y-auto relative z-10">
+            
+            <!-- SYSTEM MAIN TOP NAVBAR -->
+            <header class="h-20 border-b border-white/10 glass-panel flex items-center justify-between px-8 shrink-0">
+                <div class="flex items-center gap-4">
+                    <button class="md:hidden text-white text-xl" onclick="toggleSidebarMobile()">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div>
+                        <h1 id="view-title" class="text-xl font-display font-bold text-white tracking-wide">Studio Dashboard</h1>
+                        <p id="view-subtitle" class="text-xs text-slate-400">Central workspace management & analytics overview</p>
+                    </div>
+                </div>
+                <!-- Dynamic Status Widgets -->
+                <div class="flex items-center gap-4">
+                    <div id="file-size-badge" class="hidden md:flex items-center gap-2 bg-cyan-950/30 border border-cyan-500/20 px-3 py-1.5 rounded-lg text-xs text-cyan-400">
+                        <i class="fa-solid fa-database text-xs animate-bounce"></i>
+                        <span>Active: <strong id="active-file-size">0 MB</strong></span>
+                    </div>
+                    <div class="bg-slate-900 border border-white/10 rounded-xl px-4 py-1.5 text-xs text-slate-300 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                        <span id="live-time">00:00:00 AM</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- DYNAMIC SCREEN CHANNELS -->
+            <div class="flex-1 p-8 overflow-y-auto relative">
+
+                <!-- SCREEN 1: STUDIO DASHBOARD -->
+                <section id="dashboard-tab" class="tab-screen space-y-8">
+                    <!-- Premium Landing Promo Banner -->
+                    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-600/20 to-purple-600/20 border border-cyan-500/20 p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_120%,rgba(168,85,247,0.15),transparent)] pointer-events-none"></div>
+                        <div class="space-y-3 max-w-xl">
+                            <span class="bg-cyan-950 border border-cyan-400/30 text-cyan-400 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Client-Side Engine</span>
+                            <h2 class="text-2xl md:text-3xl font-display font-bold tracking-tight text-white">Full-Featured PDF manipulation without backend latency or privacy hazards.</h2>
+                            <p class="text-slate-400 text-sm leading-relaxed">Your data never leaves your device. All rendering, compilation, editing, and image extraction routines happen 100% locally inside your web browser environment.</p>
+                        </div>
+                        <button onclick="switchTab('editor-tab')" class="shrink-0 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white font-semibold text-sm px-6 py-3.5 rounded-xl transition duration-300 shadow-lg shadow-cyan-500/20 flex items-center gap-2 group">
+                            Launch Dynamic Editor
+                            <i class="fa-solid fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Core Suite Features Feature Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Card 1 -->
+                        <div class="glass-card rounded-2xl p-6 relative group overflow-hidden cursor-pointer" onclick="switchTab('editor-tab')">
+                            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-6 group-hover:bg-cyan-500/20 transition-all">
+                                <i class="fa-solid fa-file-signature text-xl"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-white mb-2">Signature & Overlays</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-4">Digitally sign documents, draw shapes, and place customized typography onto the layout plane of any standard document container.</p>
+                            <span class="text-xs text-cyan-400 font-semibold group-hover:underline flex items-center gap-1">Open Engine <i class="fa-solid fa-chevron-right text-[9px]"></i></span>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="glass-card rounded-2xl p-6 relative group overflow-hidden cursor-pointer" onclick="switchTab('editor-tab')">
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-6 group-hover:bg-purple-500/20 transition-all">
+                                <i class="fa-solid fa-scissors text-xl"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-white mb-2">Reorganize & Rotate</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-4">Seamlessly shift index orders, extract pages, discard redundant screens, and flip components 90° horizontally or vertically with instantaneous response times.</p>
+                            <span class="text-xs text-purple-400 font-semibold group-hover:underline flex items-center gap-1">Open Structuring <i class="fa-solid fa-chevron-right text-[9px]"></i></span>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="glass-card rounded-2xl p-6 relative group overflow-hidden cursor-pointer" onclick="switchTab('converter-tab')">
+                            <div class="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 mb-6 group-hover:bg-pink-500/20 transition-all">
+                                <i class="fa-solid fa-arrows-spin text-xl"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-white mb-2">Raster PNG Exporter</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-4">Export specific layout regions or compile every isolated structural page of your input documents directly into pristine, high-resolution PNG archives.</p>
+                            <span class="text-xs text-pink-400 font-semibold group-hover:underline flex items-center gap-1">Open Converter <i class="fa-solid fa-chevron-right text-[9px]"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Client Security Banner / FAQ -->
+                    <div class="p-6 rounded-2xl glass-card flex flex-col md:flex-row items-center gap-6 justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="text-4xl text-cyan-400">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Full Privacy Safe Mode Enabled</h4>
+                                <p class="text-slate-400 text-xs">Files loaded into MD RASEL PDF STUDIO are strictly handled within local application memory. Zero server uploads.</p>
+                            </div>
+                        </div>
+                        <div class="text-xs text-slate-500">
+                            Current Session Hash: <code class="text-slate-400 font-mono">MD-E2D-CLIENT-ON-GH</code>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- SCREEN 2: PDF INTERACTIVE EDITOR -->
+                <section id="editor-tab" class="tab-screen hidden space-y-6">
+                    
+                    <!-- File Drag & Drop Target Zone -->
+                    <div id="drop-zone-editor" class="border-2 border-dashed border-white/10 hover:border-cyan-400/50 bg-slate-900/40 rounded-2xl p-12 text-center transition-all cursor-pointer relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <input type="file" id="editor-file-input" accept="application/pdf" class="hidden">
+                        
+                        <div class="space-y-4 relative z-10">
+                            <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-cyan-400 border border-white/10 group-hover:scale-110 transition duration-300">
+                                <i class="fa-solid fa-cloud-arrow-up text-2xl animate-bounce"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-display text-lg font-bold text-white">Drag & Drop PDF file to load editor</h3>
+                                <p class="text-slate-400 text-xs mt-1">Accepts maximum container sizes up to 100MB completely local render</p>
+                            </div>
+                            <button onclick="document.getElementById('editor-file-input').click()" class="bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs px-5 py-2.5 rounded-lg border border-white/10 transition">
+                                Choose Local File
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- LOADING STATE OVERLAY -->
+                    <div id="editor-loader" class="hidden glass-card rounded-2xl p-12 text-center space-y-4">
+                        <div class="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                        <div>
+                            <p class="font-bold text-white" id="loader-progress-text">Processing Document Engine...</p>
+                            <p class="text-slate-400 text-xs">Parsing layout nodes and structuring preview canvas feeds</p>
+                        </div>
+                        <div class="w-64 bg-slate-800 h-1.5 rounded-full mx-auto overflow-hidden">
+                            <div id="editor-progress-bar" class="bg-cyan-400 h-full w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <!-- PRIMARY WORKSPACE ENVIRONMENT PANEL -->
+                    <div id="editor-workspace" class="hidden flex-col gap-6">
+                        
+                        <!-- Floating Intelligent Controls Ribbon -->
+                        <div class="glass-panel p-4 rounded-xl flex flex-wrap items-center justify-between gap-4 border border-white/10 sticky top-0 z-30">
+                            <!-- Editing Brush and Vector Elements Controls -->
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button onclick="setEditMode('select')" id="tool-select" class="tool-btn bg-cyan-500 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                    <i class="fa-solid fa-arrow-pointer"></i> Select
+                                </button>
+                                <button onclick="setEditMode('text')" id="tool-text" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                    <i class="fa-solid fa-font"></i> Text
+                                </button>
+                                <button onclick="setEditMode('draw')" id="tool-draw" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                    <i class="fa-solid fa-pen"></i> Brush
+                                </button>
+                                <button onclick="setEditMode('highlight')" id="tool-highlight" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                    <i class="fa-solid fa-highlighter text-amber-400"></i> Highlight
+                                </button>
+                                <button onclick="addRectangle()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                    <i class="fa-regular fa-square"></i> Shape
+                                </button>
+                                <button onclick="triggerSignatureModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                    <i class="fa-solid fa-signature text-purple-400"></i> Signature
+                                </button>
+                            </div>
+
+                            <!-- Color, Stroke Brush and Node Adjustments -->
+                            <div class="flex items-center gap-4 border-l border-white/10 pl-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] text-slate-400 uppercase font-semibold">Tint</span>
+                                    <input type="color" id="tool-color" value="#06b6d4" onchange="updateBrushProperties()" class="w-7 h-7 bg-transparent border border-white/10 rounded cursor-pointer">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] text-slate-400 uppercase font-semibold">Width</span>
+                                    <input type="range" id="tool-width" min="1" max="50" value="5" onchange="updateBrushProperties()" class="w-16 accent-cyan-400">
+                                </div>
+                            </div>
+
+                            <!-- View Optimization Controls (Rotate, Zoom, Operations) -->
+                            <div class="flex items-center gap-2 border-l border-white/10 pl-4">
+                                <button onclick="rotateActivePage()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg text-xs" title="Rotate Page 90° clockwise">
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                </button>
+                                <button onclick="deleteActivePage()" class="bg-red-950/20 hover:bg-red-900/30 text-red-400 border border-red-500/10 p-2 rounded-lg text-xs" title="Delete Active Page">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                                <div class="h-6 w-px bg-white/10 mx-1"></div>
+                                <button onclick="zoomCanvas(0.9)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg text-xs">
+                                    <i class="fa-solid fa-magnifying-glass-minus"></i>
+                                </button>
+                                <button onclick="zoomCanvas(1.1)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg text-xs">
+                                    <i class="fa-solid fa-magnifying-glass-plus"></i>
+                                </button>
+                            </div>
+
+                            <!-- Structural Undo-Redo & Target Output Compile Button -->
+                            <div class="flex items-center gap-2">
+                                <button onclick="clearCurrentCanvas()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-2 rounded-lg text-xs" title="Clear Canvas Layer">
+                                    <i class="fa-solid fa-eraser"></i> Clear Canvas
+                                </button>
+                                <button onclick="compileAndExportPDF()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs px-5 py-2 rounded-lg transition shadow-lg shadow-emerald-500/10 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-file-export animate-pulse"></i> Apply & Export PDF
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Core Editor View: Sidebar Thumbnails + Main Rendering Canvas -->
+                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                            
+                            <!-- Left: Interactive Structural Thumbnails -->
+                            <div class="glass-panel p-4 rounded-xl border border-white/10 flex flex-col gap-4 max-h-[70vh] overflow-y-auto lg:col-span-1">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Page Structure Layout</h4>
+                                <div id="thumbnails-container" class="space-y-4">
+                                    <!-- Dynamic Render Feed of Viewport Canvas Overviews -->
+                                </div>
+                            </div>
+
+                            <!-- Right: The Sandbox Layer Overlay Viewer -->
+                            <div class="lg:col-span-3 flex flex-col items-center">
+                                <div class="w-full flex items-center justify-between mb-4">
+                                    <span class="text-xs text-slate-400">Editing Page: <strong id="active-page-number" class="text-cyan-400">1</strong> of <span id="total-pages-number">1</span></span>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="changeActivePage(currentPageNum - 1)" class="p-1.5 bg-slate-800 rounded hover:bg-slate-700 text-xs text-slate-300"><i class="fa-solid fa-chevron-left"></i> Previous</button>
+                                        <button onclick="changeActivePage(currentPageNum + 1)" class="p-1.5 bg-slate-800 rounded hover:bg-slate-700 text-xs text-slate-300">Next <i class="fa-solid fa-chevron-right"></i></button>
+                                    </div>
+                                </div>
+
+                                <!-- The Fabric.js Sandbox Wrapper viewport container -->
+                                <div id="workspace-canvas-wrapper" class="relative bg-slate-900 border border-white/15 rounded-xl overflow-hidden flex items-center justify-center p-6 shadow-2xl">
+                                    <!-- Background rendering container dynamically instantiated via code -->
+                                    <canvas id="active-pdf-canvas" class="shadow-lg"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+
+                <!-- SCREEN 3: PDF TO PNG CONVERTER -->
+                <section id="converter-tab" class="tab-screen hidden space-y-6">
+                    
+                    <!-- File Drag & Drop Target Zone (Converter View) -->
+                    <div id="drop-zone-converter" class="border-2 border-dashed border-white/10 hover:border-pink-500/50 bg-slate-900/40 rounded-2xl p-12 text-center transition-all cursor-pointer relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <input type="file" id="converter-file-input" accept="application/pdf" class="hidden">
+                        
+                        <div class="space-y-4 relative z-10">
+                            <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-pink-400 border border-white/10 group-hover:scale-110 transition duration-300">
+                                <i class="fa-solid fa-images text-2xl animate-pulse"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-display text-lg font-bold text-white">Drag & Drop PDF file to load converter</h3>
+                                <p class="text-slate-400 text-xs mt-1">Accepts maximum container sizes up to 100MB completely local render</p>
+                            </div>
+                            <button onclick="document.getElementById('converter-file-input').click()" class="bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs px-5 py-2.5 rounded-lg border border-white/10 transition">
+                                Choose Local File
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- RUNTIME CONVERT PROCESSING SCREEN -->
+                    <div id="converter-loader" class="hidden glass-card rounded-2xl p-12 text-center space-y-4">
+                        <div class="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                        <div>
+                            <p class="font-bold text-white">Generating Raster PNG Archives...</p>
+                            <p class="text-slate-400 text-xs">Transforming page layers into high-resolution compressed matrices</p>
+                        </div>
+                        <div class="w-64 bg-slate-800 h-1.5 rounded-full mx-auto overflow-hidden">
+                            <div id="converter-progress-bar" class="bg-pink-500 h-full w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <!-- CORE CONVERSION CONFIGURATION AND CONTROLS -->
+                    <div id="converter-workspace" class="hidden flex flex-col gap-6">
+                        <div class="glass-panel p-6 rounded-xl border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-white text-lg">Target Configuration</h4>
+                                <p class="text-slate-400 text-xs">Choose specific image formats, densities, and export selections</p>
+                            </div>
+                            
+                            <div class="flex flex-wrap items-center gap-4">
+                                <!-- Scale Resolution Selection -->
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-slate-400">Scale DPI:</span>
+                                    <select id="png-scale" class="bg-slate-900 border border-white/10 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-pink-500">
+                                        <option value="1">Standard DPI (1.0x)</option>
+                                        <option value="1.5">Medium DPI (1.5x)</option>
+                                        <option value="2" selected>Prisitive HD (2.0x)</option>
+                                        <option value="3">Ultra HD (3.0x)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Extraction Range selection button sets -->
+                                <div class="flex items-center gap-2 bg-slate-900 border border-white/10 p-1.5 rounded-lg">
+                                    <button onclick="setExportRange('all')" id="btn-range-all" class="bg-pink-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition">
+                                        All Pages
+                                    </button>
+                                    <button onclick="setExportRange('selected')" id="btn-range-selected" class="text-slate-400 hover:text-white text-xs px-3 py-1.5 rounded-md font-semibold transition">
+                                        Selected Pages Only
+                                    </button>
+                                </div>
+
+                                <!-- Execute compile run button selection -->
+                                <button onclick="executePNGExport()" class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-lg shadow-pink-500/10 flex items-center gap-2 transition duration-300">
+                                    <i class="fa-solid fa-cloud-arrow-down"></i> Export PNG Pack (.zip)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Rendering Sandbox Grid Canvas Preview lists -->
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Document Overview Pages</h4>
+                                <span class="text-xs text-slate-400">Total Loaded Target Canvas Elements: <strong id="converter-count" class="text-pink-400">0</strong></span>
+                            </div>
+                            
+                            <div id="converter-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                <!-- Grid populated programmatically using custom script mechanics -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- SYSTEM FOOTER (BRANDING FOOTER) -->
+            <footer class="h-16 border-t border-white/5 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-between px-8 text-xs text-slate-500 shrink-0">
+                <div>
+                    <span>© 2026 MD RASEL. All rights reserved.</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <span>Powered by</span>
+                    <a href="https://github.com" target="_blank" class="text-slate-400 hover:text-white transition font-semibold">MD RASEL STUDIO ENGINE</a>
+                    <i class="fa-solid fa-heart text-pink-500 animate-pulse ml-1"></i>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- SIGNATURE MODAL BACKDROP CONTAINER -->
+    <div id="signature-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-md w-full rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+            <div class="p-5 border-b border-white/10 flex items-center justify-between bg-slate-900/40">
+                <h3 class="font-display font-bold text-white text-base">Draw Electronic Signature</h3>
+                <button onclick="closeSignatureModal()" class="text-slate-400 hover:text-white transition text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="bg-slate-950 border border-white/10 rounded-xl overflow-hidden">
+                    <canvas id="signature-pad" width="400" height="200" class="w-full h-48 block cursor-crosshair"></canvas>
+                </div>
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span>Draw freely inside bounds</span>
+                    <button onclick="clearSignaturePad()" class="text-slate-300 hover:text-red-400 font-semibold flex items-center gap-1">
+                        <i class="fa-solid fa-eraser"></i> Clear Pad
+                    </button>
+                </div>
+            </div>
+            <div class="p-5 border-t border-white/10 bg-slate-900/20 flex gap-3">
+                <button onclick="closeSignatureModal()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition">Cancel</button>
+                <button onclick="applySignature()" class="flex-1 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white rounded-lg text-xs font-semibold transition shadow-lg shadow-cyan-500/10">Insert Signature</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KEYBOARD SHORTCUTS INSTRUCTIONAL MODAL -->
+    <div id="shortcuts-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-sm w-full rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+            <div class="p-5 border-b border-white/10 flex items-center justify-between bg-slate-900/40">
+                <h3 class="font-display font-bold text-white text-base">System Shortcuts</h3>
+                <button onclick="closeKeyboardShortcuts()" class="text-slate-400 hover:text-white transition text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+                <div class="flex justify-between items-center py-1.5 border-b border-white/5">
+                    <span class="text-slate-400">Select Mode</span>
+                    <span class="kbd-key">V</span>
+                </div>
+                <div class="flex justify-between items-center py-1.5 border-b border-white/5">
+                    <span class="text-slate-400">Text Mode</span>
+                    <span class="kbd-key">T</span>
+                </div>
+                <div class="flex justify-between items-center py-1.5 border-b border-white/5">
+                    <span class="text-slate-400">Brush Mode</span>
+                    <span class="kbd-key">B</span>
+                </div>
+                <div class="flex justify-between items-center py-1.5 border-b border-white/5">
+                    <span class="text-slate-400">Delete Key Element</span>
+                    <span class="kbd-key">Del / Backspace</span>
+                </div>
+                <div class="flex justify-between items-center py-1.5">
+                    <span class="text-slate-400">Zoom Canvas In / Out</span>
+                    <span class="kbd-key">CTRL + Mousewheel</span>
+                </div>
+            </div>
+            <div class="p-5 border-t border-white/10 bg-slate-900/20">
+                <button onclick="closeKeyboardShortcuts()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold transition">Got It</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- COMPLETE ENGINE JAVASCRIPT LOGIC WORKSPACE -->
+    <script>
+        // Set worker endpoint for PDF.js engine safely to prevent cross-origin issues
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // GLOBAL APPLICATION SYSTEM STATE OBJECT
+        let appState = {
+            pdfDoc: null,         // Original pdfjsLib parsed document reference
+            pdfBytes: null,       // Original input ArrayBuffer array for editing compilation
+            pdfLibDoc: null,      // PDF-Lib parsed memory document instantiation
+            currentPageNum: 1,    // Single numerical track cursor pointer
+            totalPages: 0,        // Absolute boundaries tracking metadata
+            zoomLevel: 1.0,       // Absolute structural zoom modifier
+            editMode: 'select',   // Active element interactions select pointer brush state
+            canvasInstances: {},  // Page numeric maps containing unique operational instances
+            selectedExportPages: [], // PDF To PNG custom user range tracking vector arrays
+            exportRangeMode: 'all',  // Conversion selection target indicator ('all' or 'selected')
+            currentFileMetadata: { name: "", size: 0, rawBytes: null }
+        };
+
+        // UI View Shortcuts Reference Hookup
+        let currentPageNum = 1;
+
+        // Initialize Background Particle Floating Animations on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('particles-container');
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = `${Math.random() * 80 + 20}px`;
+                particle.style.height = particle.style.width;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.bottom = `-100px`;
+                particle.style.animationDelay = `${Math.random() * 12}s`;
+                particle.style.animationDuration = `${Math.random() * 10 + 15}s`;
+                container.appendChild(particle);
+            }
+            
+            // Auto fade out transition screen layer
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.classList.add('splash-fade');
+                showToast("MD RASEL PDF STUDIO loaded", "success");
+            }, 1200);
+
+            // Handle live clock widget cycle runs
+            setInterval(() => {
+                const date = new Date();
+                document.getElementById('live-time').innerText = date.toLocaleTimeString();
+            }, 1000);
+
+            // Set dynamic drag drop target area event listener bindings
+            setupDragDropZone('drop-zone-editor', 'editor-file-input', loadPDFInWorkspace);
+            setupDragDropZone('drop-zone-converter', 'converter-file-input', loadPDFInConverter);
+
+            // Fetch dynamic local storage updates on load
+            populateRecentFiles();
+
+            // Setup custom electronic drawing touch signature pad
+            initSignaturePad();
+        });
+
+        // Dynamic System Language Switch Mod Hooks
+        function changeLanguage() {
+            const lang = document.getElementById('lang-select').value;
+            if (lang === 'bn') {
+                document.getElementById('view-title').innerText = "স্টুডিও ড্যাশবোর্ড";
+                document.getElementById('view-subtitle').innerText = "সেন্ট্রাল ওয়ার্কস্পেস ম্যানেজমেন্ট এবং অ্যানালিটিক্স";
+                showToast("বাংলা ভাষা নির্বাচন করা হয়েছে", "success");
+            } else if (lang === 'es') {
+                document.getElementById('view-title').innerText = "Panel de Control";
+                document.getElementById('view-subtitle').innerText = "Gestión central del espacio de trabajo y análisis";
+                showToast("Idioma cambiado a Español", "success");
+            } else {
+                document.getElementById('view-title').innerText = "Studio Dashboard";
+                document.getElementById('view-subtitle').innerText = "Central workspace management & analytics overview";
+                showToast("Language updated to English", "success");
+            }
+        }
+
+        // Custom Toast Notifications Logic
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let iconClass = "fa-circle-info text-cyan-400";
+            let borderColor = "border-cyan-500/20";
+            if (type === 'success') {
+                iconClass = "fa-circle-check text-emerald-400";
+                borderColor = "border-emerald-500/20";
+            } else if (type === 'error') {
+                iconClass = "fa-circle-exclamation text-red-400";
+                borderColor = "border-red-500/20";
+            }
+
+            toast.className = `glass-panel px-4 py-3 rounded-xl border ${borderColor} flex items-center gap-3 transition-all duration-300 transform translate-y-2 opacity-0 shadow-lg`;
+            toast.innerHTML = `
+                <i class="fa-solid ${iconClass}"></i>
+                <span class="text-xs text-slate-200 font-medium">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Global Sidebar Menu Tab Operations switches
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-screen').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.className = "nav-tab w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left text-sm text-slate-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent";
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const targetBtn = document.getElementById(`btn-${tabId}`);
+            targetBtn.className = "nav-tab active-tab w-full flex items-center justify-between px-4 py-3 rounded-xl transition text-left text-sm bg-gradient-to-r from-cyan-500/10 to-transparent border-l-4 border-cyan-400 text-cyan-400";
+            
+            const headTitle = document.getElementById('view-title');
+            const headSub = document.getElementById('view-subtitle');
+            
+            if (tabId === 'dashboard-tab') {
+                headTitle.innerText = "Studio Dashboard";
+                headSub.innerText = "Central workspace management & analytics overview";
+            } else if (tabId === 'editor-tab') {
+                headTitle.innerText = "PDF Interactive Editor";
+                headSub.innerText = "Digitize layers, apply signatures and change layouts directly";
+            } else if (tabId === 'converter-tab') {
+                headTitle.innerText = "PDF to PNG Converter";
+                headSub.innerText = "Generate and extract raster images from document files";
+            }
+        }
+
+        // Drag and Drop Zone Target Utility
+        function setupDragDropZone(zoneId, inputId, onFileSelected) {
+            const zone = document.getElementById(zoneId);
+            const input = document.getElementById(inputId);
+
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('border-cyan-400');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('border-cyan-400');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('border-cyan-400');
+                if (e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.type === 'application/pdf') {
+                        onFileSelected(file);
+                    } else {
+                        showToast("Invalid format, please load target PDF container", "error");
+                    }
+                }
+            });
+
+            input.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    onFileSelected(e.target.files[0]);
+                }
+            });
+        }
+
+        // Dynamic File Size Formatting Utility
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+
+        // ==========================================
+        // MAIN PIPELINE SECTION 1: PDF EDITOR ENGINE
+        // ==========================================
+
+        async function loadPDFInWorkspace(file) {
+            try {
+                // Initialize workspace loading loader indicator animations
+                document.getElementById('drop-zone-editor').classList.add('hidden');
+                const loader = document.getElementById('editor-loader');
+                loader.classList.remove('hidden');
+                document.getElementById('editor-progress-bar').style.width = '30%';
+
+                appState.currentFileMetadata = {
+                    name: file.name,
+                    size: file.size,
+                    rawBytes: file
+                };
+
+                // Read bytes to local ArrayBuffer representation
+                const reader = new FileReader();
+                reader.onload = async function() {
+                    const arrayBuffer = this.result;
+                    appState.pdfBytes = arrayBuffer;
+
+                    // Execute pdf.js and pdf-lib memory loading routines
+                    document.getElementById('editor-progress-bar').style.width = '60%';
+                    appState.pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    appState.pdfLibDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+                    
+                    appState.totalPages = appState.pdfDoc.numPages;
+                    currentPageNum = 1;
+
+                    // Update System Metadata Display Dashboard Badges
+                    document.getElementById('file-size-badge').classList.remove('hidden');
+                    document.getElementById('active-file-size').innerText = formatBytes(file.size);
+
+                    // Render dynamic preview thumbnails list
+                    document.getElementById('editor-progress-bar').style.width = '80%';
+                    await buildEditorThumbnails();
+
+                    // Instantiation workspace active canvas frame render
+                    document.getElementById('editor-progress-bar').style.width = '100%';
+                    setTimeout(() => {
+                        loader.classList.add('hidden');
+                        document.getElementById('editor-workspace').classList.remove('hidden');
+                        document.getElementById('editor-workspace').classList.add('flex');
+                        changeActivePage(1);
+                        saveRecentFileRecord(file.name, file.size);
+                        showToast("Document loaded into Workspace Environment", "success");
+                    }, 400);
+                };
+                reader.readAsArrayBuffer(file);
+            } catch (err) {
+                console.error(err);
+                showToast("Error processing PDF: " + err.message, "error");
+                document.getElementById('drop-zone-editor').classList.remove('hidden');
+                document.getElementById('editor-loader').classList.add('hidden');
+            }
+        }
+
+        // Build left-side dynamic document structure preview layout cards
+        async function buildEditorThumbnails() {
+            const container = document.getElementById('thumbnails-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= appState.totalPages; i++) {
+                const thumbWrapper = document.createElement('div');
+                thumbWrapper.id = `thumb-page-${i}`;
+                thumbWrapper.className = `glass-card p-2 rounded-xl border border-white/5 flex flex-col items-center gap-2 cursor-pointer transition hover:border-cyan-400 ${i === 1 ? 'border-cyan-400 bg-cyan-950/20' : ''}`;
+                thumbWrapper.onclick = () => changeActivePage(i);
+
+                const canvas = document.createElement('canvas');
+                canvas.className = "w-full rounded bg-slate-900";
+                
+                // Read scaling for quick low-profile thumbnail render
+                const page = await appState.pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 0.25 });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                const renderContext = {
+                    canvasContext: canvas.getContext('2d'),
+                    viewport: viewport
+                };
+                await page.render(renderContext).promise;
+
+                thumbWrapper.appendChild(canvas);
+
+                const meta = document.createElement('div');
+                meta.className = "text-[10px] text-slate-400 font-semibold";
+                meta.innerText = `Page ${i}`;
+                thumbWrapper.appendChild(meta);
+
+                container.appendChild(thumbWrapper);
+            }
+        }
+
+        // Handle Active Working Screen Frame Render Loop
+        async function changeActivePage(pageNum) {
+            if (pageNum < 1 || pageNum > appState.totalPages) return;
+            
+            // Highlight thumbnail indicators
+            document.querySelectorAll('#thumbnails-container > div').forEach(el => {
+                el.classList.remove('border-cyan-400', 'bg-cyan-950/20');
+            });
+            const activeThumb = document.getElementById(`thumb-page-${pageNum}`);
+            if (activeThumb) activeThumb.classList.add('border-cyan-400', 'bg-cyan-950/20');
+
+            currentPageNum = pageNum;
+            document.getElementById('active-page-number').innerText = pageNum;
+            document.getElementById('total-pages-number').innerText = appState.totalPages;
+
+            // Render page background layer elements inside Sandbox Wrapper canvas viewports
+            const page = await appState.pdfDoc.getPage(pageNum);
+            const viewport = page.getViewport({ scale: appState.zoomLevel * 1.5 });
+            
+            const activeCanvas = document.getElementById('active-pdf-canvas');
+            const ctx = activeCanvas.getContext('2d');
+            activeCanvas.width = viewport.width;
+            activeCanvas.height = viewport.height;
+
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+            await page.render(renderContext).promise;
+
+            // Initialize or retrieve Fabric JS interactive canvas layers over target canvas
+            initFabricLayer(activeCanvas, pageNum);
+        }
+
+        // Initialize Fabric.JS layer overlay on top of standard pdf page context canvas
+        function initFabricLayer(targetCanvas, pageNum) {
+            const wrapper = document.getElementById('workspace-canvas-wrapper');
+            
+            // Remove previous active Fabric element container wraps
+            const existingContainer = wrapper.querySelector('.canvas-container');
+            if (existingContainer) {
+                existingContainer.remove();
+                // Append original clean canvas back to DOM node
+                const cleanCanvas = document.createElement('canvas');
+                cleanCanvas.id = 'active-pdf-canvas';
+                cleanCanvas.className = "shadow-lg";
+                wrapper.appendChild(cleanCanvas);
+                // Recursive self call once container clean to avoid canvas clone duplicates
+                initFabricLayer(cleanCanvas, pageNum);
+                return;
+            }
+
+            // Create high density backing target frame
+            const backingImage = targetCanvas.toDataURL("image/png");
+
+            // Instantiate Fabric.Canvas framework elements on background canvas wrapper structures
+            const fCanvas = new fabric.Canvas('active-pdf-canvas', {
+                width: targetCanvas.width,
+                height: targetCanvas.height
+            });
+
+            // Set background texture to match PDF page layout
+            fabric.Image.fromURL(backingImage, function(img) {
+                fCanvas.setBackgroundImage(img, fCanvas.renderAll.bind(fCanvas));
+            });
+
+            // Load saved changes object models from local application cache if they exist
+            if (appState.canvasInstances[pageNum]) {
+                fCanvas.loadFromJSON(appState.canvasInstances[pageNum], () => {
+                    fCanvas.renderAll();
+                });
+            }
+
+            appState.canvasInstances[pageNum] = fCanvas;
+
+            // Force dynamic binding system properties on elements change and canvas modifications
+            fCanvas.on('after:render', () => {
+                // Keep memory buffer object active maps updated dynamically
+                appState.canvasInstances[pageNum] = JSON.stringify(fCanvas.toJSON());
+            });
+
+            // Bind global canvas delete keyboard hooks
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    const activeObj = fCanvas.getActiveObject();
+                    if (activeObj && !activeObj.isEditing) {
+                        fCanvas.remove(activeObj);
+                        fCanvas.requestRenderAll();
+                    }
+                }
+            });
+
+            // Set immediate workspace control brush styles
+            setEditMode(appState.editMode);
+        }
+
+        // Master switch controls mode toggles
+        function setEditMode(mode) {
+            appState.editMode = mode;
+            document.querySelectorAll('.tool-btn').forEach(el => {
+                el.className = "tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition";
+            });
+
+            const targetBtn = document.getElementById(`tool-${mode}`);
+            if (targetBtn) {
+                targetBtn.className = "tool-btn bg-cyan-500 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition";
+            }
+
+            // Retrieve current target Fabric JS instance context
+            const fCanvas = getActiveFabricInstance();
+            if (!fCanvas) return;
+
+            // Reset core states on structural change
+            fCanvas.isDrawingMode = false;
+            fCanvas.selection = true;
+            fCanvas.forEachObject(o => o.selectable = o.evented = true);
+
+            const activeColor = document.getElementById('tool-color').value;
+            const activeWidth = parseInt(document.getElementById('tool-width').value);
+
+            if (mode === 'draw') {
+                fCanvas.isDrawingMode = true;
+                fCanvas.freeDrawingBrush.color = activeColor;
+                fCanvas.freeDrawingBrush.width = activeWidth;
+            } else if (mode === 'highlight') {
+                fCanvas.isDrawingMode = true;
+                // Add translucent rendering capabilities for document layout highlighter tools
+                fCanvas.freeDrawingBrush.color = activeColor + "66"; // Translucent alpha channel appending hex code
+                fCanvas.freeDrawingBrush.width = activeWidth * 2;
+            } else if (mode === 'text') {
+                // Insert editable dynamic text input bounding frame
+                const text = new fabric.IText('Double click to edit', {
+                    left: fCanvas.width / 2 - 100,
+                    top: fCanvas.height / 2 - 15,
+                    fontFamily: 'Plus Jakarta Sans',
+                    fill: activeColor,
+                    fontSize: 24,
+                    borderColor: '#06b6d4',
+                    cornerColor: '#06b6d4'
+                });
+                fCanvas.add(text);
+                fCanvas.setActiveObject(text);
+                appState.editMode = 'select'; // Toggle mode back directly to selection tool state
+                setEditMode('select');
+            }
+        }
+
+        // Retrieve current active memory container elements
+        function getActiveFabricInstance() {
+            const canvasWrapper = document.getElementById('workspace-canvas-wrapper');
+            const fabricCanvasEl = canvasWrapper.querySelector('.lower-canvas');
+            if (!fabricCanvasEl) return null;
+            
+            // Extract fabric structure directly using instance identifier mappings
+            return fabric.instances && Object.values(fabric.instances).find(inst => inst.lowerCanvasEl === fabricCanvasEl);
+        }
+
+        // Trigger dynamic color dynamic parameter updates to brushes properties
+        function updateBrushProperties() {
+            setEditMode(appState.editMode);
+        }
+
+        // Action: Draw structural bounding shape overlays onto dynamic Canvas Layout planes
+        function addRectangle() {
+            const fCanvas = getActiveFabricInstance();
+            if (!fCanvas) return;
+
+            const rect = new fabric.Rect({
+                left: fCanvas.width / 2 - 50,
+                top: fCanvas.height / 2 - 50,
+                fill: 'transparent',
+                stroke: document.getElementById('tool-color').value,
+                strokeWidth: parseInt(document.getElementById('tool-width').value),
+                width: 100,
+                height: 100,
+                cornerColor: '#06b6d4'
+            });
+
+            fCanvas.add(rect);
+            fCanvas.setActiveObject(rect);
+            setEditMode('select');
+        }
+
+        // Action Zoom manipulation routine methods
+        function zoomCanvas(factor) {
+            appState.zoomLevel = Math.max(0.5, Math.min(2.5, appState.zoomLevel * factor));
+            changeActivePage(currentPageNum);
+            showToast(`Zoom: ${Math.round(appState.zoomLevel * 100)}%`, "info");
+        }
+
+        // Clear dynamic elements on the active Fabric layout layer
+        function clearCurrentCanvas() {
+            const fCanvas = getActiveFabricInstance();
+            if (fCanvas) {
+                fCanvas.clear();
+                // Ensure layout restoration framework image maps persist
+                const cleanCanvas = document.getElementById('active-pdf-canvas');
+                const cleanContext = cleanCanvas.getContext('2d');
+                const backingImg = cleanCanvas.toDataURL("image/png");
+                fabric.Image.fromURL(backingImg, function(img) {
+                    fCanvas.setBackgroundImage(img, fCanvas.renderAll.bind(fCanvas));
+                });
+                showToast("Dynamic Canvas cleared", "info");
+            }
+        }
+
+        // Dynamic Document Rotation Logic (90-degree steps)
+        async function rotateActivePage() {
+            if (!appState.pdfLibDoc) return;
+            try {
+                const page = appState.pdfLibDoc.getPage(currentPageNum - 1);
+                const currentRotation = page.getRotation().angle;
+                const nextRotation = (currentRotation + 90) % 360;
+                page.setRotation(PDFLib.degrees(nextRotation));
+                
+                // Export modified layout to local array buffer
+                const pdfBytes = await appState.pdfLibDoc.save();
+                appState.pdfBytes = pdfBytes.buffer;
+                appState.pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes.buffer }).promise;
+                
+                await buildEditorThumbnails();
+                await changeActivePage(currentPageNum);
+                showToast(`Page ${currentPageNum} rotated directly to ${nextRotation}°`, "success");
+            } catch (err) {
+                showToast("Error executing page rotation: " + err.message, "error");
+            }
+        }
+
+        // Discard page from document context
+        async function deleteActivePage() {
+            if (!appState.pdfLibDoc || appState.totalPages <= 1) {
+                showToast("Cannot delete pages on solitary file templates", "error");
+                return;
+            }
+
+            if (confirm(`Are you sure you want to delete Page ${currentPageNum}?`)) {
+                try {
+                    appState.pdfLibDoc.removePage(currentPageNum - 1);
+                    appState.totalPages -= 1;
+                    
+                    // Reset internal structured layout indices maps directly on delete mutations
+                    const updatedInstances = {};
+                    Object.keys(appState.canvasInstances).forEach(key => {
+                        const parsedKey = parseInt(key);
+                        if (parsedKey < currentPageNum) {
+                            updatedInstances[parsedKey] = appState.canvasInstances[parsedKey];
+                        } else if (parsedKey > currentPageNum) {
+                            updatedInstances[parsedKey - 1] = appState.canvasInstances[parsedKey];
+                        }
+                    });
+                    appState.canvasInstances = updatedInstances;
+
+                    const pdfBytes = await appState.pdfLibDoc.save();
+                    appState.pdfBytes = pdfBytes.buffer;
+                    appState.pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes.buffer }).promise;
+
+                    // Relocate pagination structures safely
+                    currentPageNum = Math.max(1, currentPageNum - 1);
+
+                    await buildEditorThumbnails();
+                    await changeActivePage(currentPageNum);
+                    showToast("Deleted structural page context", "success");
+                } catch (err) {
+                    showToast("Error processing structural layout update: " + err.message, "error");
+                }
+            }
+        }
+
+        // Dynamic Canvas overlay image exporter execution loop logic
+        async function compileAndExportPDF() {
+            if (!appState.pdfBytes || !appState.pdfLibDoc) return;
+
+            showToast("Executing Document Packaging Compiler...", "info");
+            
+            try {
+                // Read local application models to apply changes to target memory structure
+                const fInstances = fabric.instances;
+                const keys = Object.keys(appState.canvasInstances);
+
+                for (let key of keys) {
+                    const pageIndex = parseInt(key) - 1;
+                    const jsonState = appState.canvasInstances[key];
+                    
+                    if (jsonState) {
+                        // Create a temporary off-screen Canvas to render vectors without UI artifacts
+                        const tempCanvas = document.createElement('canvas');
+                        const page = await appState.pdfDoc.getPage(pageIndex + 1);
+                        const viewport = page.getViewport({ scale: 2.0 }); // High-definition export
+                        tempCanvas.width = viewport.width;
+                        tempCanvas.height = viewport.height;
+
+                        const fTempCanvas = new fabric.StaticCanvas(tempCanvas, {
+                            width: viewport.width,
+                            height: viewport.height
+                        });
+
+                        // Synchronously await JSON state loading
+                        await new Promise((resolve) => {
+                            fTempCanvas.loadFromJSON(jsonState, () => {
+                                fTempCanvas.renderAll();
+                                resolve();
+                            });
+                        });
+
+                        // Output high precision overlay with absolute transparent channel background layers
+                        fTempCanvas.setBackgroundImage(null, fTempCanvas.renderAll.bind(fTempCanvas));
+                        
+                        const items = fTempCanvas.getObjects();
+                        if (items.length > 0) {
+                            const overlayDataUrl = fTempCanvas.toDataURL({
+                                format: 'png',
+                                quality: 1.0
+                            });
+
+                            // Embed the PNG overlay back onto the corresponding PDF-Lib page layout
+                            const overlayImageBytes = await fetch(overlayDataUrl).then(res => res.arrayBuffer());
+                            const embeddedImage = await appState.pdfLibDoc.embedPng(overlayImageBytes);
+
+                            const pdfLibPage = appState.pdfLibDoc.getPage(pageIndex);
+                            const { width, height } = pdfLibPage.getSize();
+
+                            // Maintain aspect ratio dimensions dynamically on merge rendering actions
+                            pdfLibPage.drawImage(embeddedImage, {
+                                x: 0,
+                                y: 0,
+                                width: width,
+                                height: height,
+                                opacity: 1.0
+                            });
+                        }
+                        
+                        fTempCanvas.dispose();
+                    }
+                }
+
+                // Compress file structures into clean Uint8Array byte output streams
+                const finalPdfBytes = await appState.pdfLibDoc.save();
+                const blob = new Blob([finalPdfBytes], { type: "application/pdf" });
+                
+                // Trigger download directly inside client framework using FileSaver
+                const outName = appState.currentFileMetadata.name.replace(".pdf", "_edited_rasel.pdf");
+                saveAs(blob, outName);
+                showToast("Document package exported successfully", "success");
+
+            } catch (err) {
+                console.error(err);
+                showToast("Export process aborted: " + err.message, "error");
+            }
+        }
+
+
+        // ==========================================
+        // ELECTRONIC SIGNATURE PAD SYSTEM HANDLERS
+        // ==========================================
+
+        let sigPadInstance = {
+            canvas: null,
+            ctx: null,
+            drawing: false
+        };
+
+        function initSignaturePad() {
+            sigPadInstance.canvas = document.getElementById('signature-pad');
+            sigPadInstance.ctx = sigPadInstance.canvas.getContext('2d');
+            
+            const canvas = sigPadInstance.canvas;
+            const ctx = sigPadInstance.ctx;
+
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round";
+
+            // Drawing event mechanics
+            canvas.addEventListener('mousedown', (e) => {
+                sigPadInstance.drawing = true;
+                ctx.beginPath();
+                ctx.moveTo(e.offsetX, e.offsetY);
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (sigPadInstance.drawing) {
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                }
+            });
+
+            canvas.addEventListener('mouseup', () => sigPadInstance.drawing = false);
+            canvas.addEventListener('mouseleave', () => sigPadInstance.drawing = false);
+        }
+
+        function triggerSignatureModal() {
+            document.getElementById('signature-modal').classList.remove('hidden');
+            clearSignaturePad();
+        }
+
+        function closeSignatureModal() {
+            document.getElementById('signature-modal').classList.add('hidden');
+        }
+
+        function clearSignaturePad() {
+            const canvas = sigPadInstance.canvas;
+            sigPadInstance.ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function applySignature() {
+            const canvas = sigPadInstance.canvas;
+            
+            // Check signature transparency layers bounds
+            const dataUrl = canvas.toDataURL("image/png");
+            const fCanvas = getActiveFabricInstance();
+            
+            if (fCanvas) {
+                fabric.Image.fromURL(dataUrl, (img) => {
+                    img.set({
+                        left: fCanvas.width / 2 - 75,
+                        top: fCanvas.height / 2 - 37,
+                        scaleX: 0.5,
+                        scaleY: 0.5,
+                        borderColor: '#06b6d4',
+                        cornerColor: '#06b6d4'
+                    });
+                    fCanvas.add(img);
+                    fCanvas.setActiveObject(img);
+                    fCanvas.renderAll();
+                    showToast("Signature overlay placed into Workspace", "success");
+                });
+            }
+            closeSignatureModal();
+        }
+
+
+        // ==========================================
+        // MAIN PIPELINE SECTION 2: PDF TO PNG CONVERTER
+        // ==========================================
+
+        async function loadPDFInConverter(file) {
+            try {
+                document.getElementById('drop-zone-converter').classList.add('hidden');
+                const loader = document.getElementById('converter-loader');
+                loader.classList.remove('hidden');
+                document.getElementById('converter-progress-bar').style.width = '30%';
+
+                const reader = new FileReader();
+                reader.onload = async function() {
+                    const arrayBuffer = this.result;
+                    
+                    appState.pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    appState.totalPages = appState.pdfDoc.numPages;
+                    appState.selectedExportPages = [];
+
+                    document.getElementById('converter-progress-bar').style.width = '70%';
+                    await buildConverterPageGrid();
+
+                    document.getElementById('converter-progress-bar').style.width = '100%';
+                    setTimeout(() => {
+                        loader.classList.add('hidden');
+                        document.getElementById('converter-workspace').classList.remove('hidden');
+                        showToast("Renderer workspace matrices parsed successfully", "success");
+                    }, 400);
+                };
+                reader.readAsArrayBuffer(file);
+            } catch (err) {
+                showToast("Parsing converter structures failed: " + err.message, "error");
+                document.getElementById('drop-zone-converter').classList.remove('hidden');
+                document.getElementById('converter-loader').classList.add('hidden');
+            }
+        }
+
+        // Render document overview grid mapping inside conversion dashboard panel
+        async function buildConverterPageGrid() {
+            const grid = document.getElementById('converter-grid');
+            grid.innerHTML = '';
+            document.getElementById('converter-count').innerText = appState.totalPages;
+
+            for (let i = 1; i <= appState.totalPages; i++) {
+                const card = document.createElement('div');
+                card.id = `conv-page-${i}`;
+                card.className = "glass-card p-3 rounded-xl border border-white/5 flex flex-col gap-3 cursor-pointer relative group transition duration-300 hover:border-pink-500/50";
+                card.onclick = () => togglePageForExport(i);
+
+                // Selector indicator bubble tag overlay elements
+                const selectBubble = document.createElement('div');
+                selectBubble.id = `conv-bubble-${i}`;
+                selectBubble.className = "absolute top-4 right-4 w-6 h-6 rounded-full bg-slate-900/80 border border-white/20 flex items-center justify-center text-xs text-white transition";
+                selectBubble.innerHTML = `<i class="fa-solid fa-check opacity-0"></i>`;
+                card.appendChild(selectBubble);
+
+                const canvas = document.createElement('canvas');
+                canvas.className = "w-full rounded bg-slate-900";
+                
+                const page = await appState.pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 0.35 });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                const renderContext = {
+                    canvasContext: canvas.getContext('2d'),
+                    viewport: viewport
+                };
+                await page.render(renderContext).promise;
+
+                card.appendChild(canvas);
+
+                const label = document.createElement('div');
+                label.className = "flex justify-between items-center text-xs font-semibold text-slate-400";
+                label.innerHTML = `<span>Page ${i}</span> <span class="text-[10px] text-slate-500">${viewport.width * 2}x${viewport.height * 2} px</span>`;
+                card.appendChild(label);
+
+                grid.appendChild(card);
+            }
+        }
+
+        // Handle page selection toggle mechanics
+        function togglePageForExport(pageNum) {
+            const index = appState.selectedExportPages.indexOf(pageNum);
+            const bubble = document.getElementById(`conv-bubble-${pageNum}`);
+            const card = document.getElementById(`conv-page-${pageNum}`);
+
+            if (index > -1) {
+                appState.selectedExportPages.splice(index, 1);
+                bubble.className = "absolute top-4 right-4 w-6 h-6 rounded-full bg-slate-900/80 border border-white/20 flex items-center justify-center text-xs text-white transition";
+                bubble.innerHTML = `<i class="fa-solid fa-check opacity-0"></i>`;
+                card.classList.remove('border-pink-500', 'bg-pink-950/10');
+            } else {
+                appState.selectedExportPages.push(pageNum);
+                bubble.className = "absolute top-4 right-4 w-6 h-6 rounded-full bg-pink-500 border border-pink-400 flex items-center justify-center text-xs text-white shadow-lg transition";
+                bubble.innerHTML = `<i class="fa-solid fa-check"></i>`;
+                card.classList.add('border-pink-500', 'bg-pink-950/10');
+            }
+        }
+
+        // Change range target extraction configuration properties options
+        function setExportRange(mode) {
+            appState.exportRangeMode = mode;
+            document.getElementById('btn-range-all').className = "text-slate-400 hover:text-white text-xs px-3 py-1.5 rounded-md font-semibold transition";
+            document.getElementById('btn-range-selected').className = "text-slate-400 hover:text-white text-xs px-3 py-1.5 rounded-md font-semibold transition";
+
+            if (mode === 'all') {
+                document.getElementById('btn-range-all').className = "bg-pink-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition shadow-md shadow-pink-500/10";
+            } else {
+                document.getElementById('btn-range-selected').className = "bg-pink-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition shadow-md shadow-pink-500/10";
+            }
+        }
+
+        // Trigger compilation and execution steps for high fidelity PDF-to-PNG generation
+        async function executePNGExport() {
+            let targets = [];
+            if (appState.exportRangeMode === 'all') {
+                for (let i = 1; i <= appState.totalPages; i++) targets.push(i);
+            } else {
+                targets = [...appState.selectedExportPages].sort((a,b) => a-b);
+            }
+
+            if (targets.length === 0) {
+                showToast("Please choose target compilation screens first", "error");
+                return;
+            }
+
+            showToast(`Generating image archives for ${targets.length} pages...`, "info");
+            
+            document.getElementById('converter-workspace').classList.add('hidden');
+            const loader = document.getElementById('converter-loader');
+            loader.classList.remove('hidden');
+
+            const scaleFactor = parseFloat(document.getElementById('png-scale').value);
+            const zip = new JSZip();
+
+            try {
+                for (let idx = 0; idx < targets.length; idx++) {
+                    const pageNum = targets[idx];
+                    
+                    // Display loading updates programmatically
+                    const progressPercent = Math.round(((idx + 1) / targets.length) * 100);
+                    document.getElementById('converter-progress-bar').style.width = `${progressPercent}%`;
+
+                    const page = await appState.pdfDoc.getPage(pageNum);
+                    const viewport = page.getViewport({ scale: scaleFactor });
+                    
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = viewport.width;
+                    tempCanvas.height = viewport.height;
+                    const ctx = tempCanvas.getContext('2d');
+
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    await page.render(renderContext).promise;
+
+                    // Output clean high precision raster blobs
+                    const blob = await new Promise((resolve) => tempCanvas.toBlob(resolve, 'image/png'));
+                    zip.file(`page-${pageNum}.png`, blob);
+                }
+
+                // Compress output ZIP stream and trigger down file packaging mechanics
+                const content = await zip.generateAsync({ type: "blob" });
+                saveAs(content, "MD_RASEL_PNG_PACK_STUDIO.zip");
+                
+                showToast("Image matrix archive compilation completed", "success");
+            } catch (err) {
+                showToast("Compilation engine execution failed: " + err.message, "error");
+            } finally {
+                loader.classList.add('hidden');
+                document.getElementById('converter-workspace').classList.remove('hidden');
+            }
+        }
+
+
+        // ==========================================
+        // SYSTEM WORKSPACE STORAGE & CACHE UTILITIES
+        // ==========================================
+
+        function saveRecentFileRecord(name, size) {
+            let files = JSON.parse(localStorage.getItem('rasel_studio_recent_files') || '[]');
+            // Filter duplicates from the array
+            files = files.filter(f => f.name !== name);
+            files.unshift({ name, size, date: new Date().toLocaleDateString() });
+            
+            // Slice structural storage limit bounds
+            if (files.length > 5) files.pop();
+            localStorage.setItem('rasel_studio_recent_files', JSON.stringify(files));
+            populateRecentFiles();
+        }
+
+        function populateRecentFiles() {
+            const list = document.getElementById('recent-files-list');
+            const files = JSON.parse(localStorage.getItem('rasel_studio_recent_files') || '[]');
+            
+            if (files.length === 0) {
+                list.innerHTML = `<div class="text-[11px] text-slate-500 italic p-2 text-center">No recent files in cache.</div>`;
+                return;
+            }
+
+            list.innerHTML = '';
+            files.forEach(f => {
+                const item = document.createElement('div');
+                item.className = "flex flex-col p-2 rounded bg-white/5 border border-white/5 text-[11px] truncate cursor-pointer hover:border-cyan-400 hover:bg-cyan-950/20 transition";
+                item.innerHTML = `
+                    <span class="text-slate-300 font-semibold truncate"><i class="fa-solid fa-file-pdf mr-1 text-red-400"></i>${f.name}</span>
+                    <span class="text-slate-500 text-[9px] mt-0.5">${f.date} • ${formatBytes(f.size)}</span>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function clearCache() {
+            if (confirm("Reset workspace cache environment states?")) {
+                localStorage.removeItem('rasel_studio_recent_files');
+                appState.canvasInstances = {};
+                populateRecentFiles();
+                showToast("Workspace configuration successfully purged", "success");
+            }
+        }
+
+        // Toggle global Theme styles
+        function toggleTheme() {
+            const html = document.documentElement;
+            const indicator = document.getElementById('theme-indicator');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                indicator.innerHTML = `<i class="fa-solid fa-sun text-amber-500 text-sm animate-spin"></i>`;
+                showToast("Light mode activated temporarily", "info");
+            } else {
+                html.classList.add('dark');
+                indicator.innerHTML = `<i class="fa-solid fa-moon text-cyan-400 text-sm"></i>`;
+                showToast("Futuristic Dark mode activated", "success");
+            }
+        }
+
+        // Modal triggers
+        function openKeyboardShortcuts() {
+            document.getElementById('shortcuts-modal').classList.remove('hidden');
+        }
+
+        function closeKeyboardShortcuts() {
+            document.getElementById('shortcuts-modal').classList.add('hidden');
+        }
+
+        function toggleSidebarMobile() {
+            const sidebar = document.querySelector('aside');
+            sidebar.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
