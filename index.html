@@ -146,7 +146,7 @@
     <!-- MAIN DASHBOARD CONTENT GRID -->
     <div class="flex-1 flex flex-col md:flex-row z-10 min-h-screen">
         
-        <!-- SIDEBAR NAVIGATION PANEL (Responsive Layout Optimised) -->
+        <!-- SIDEBAR NAVIGATION PANEL -->
         <aside id="sidebar-panel" class="hidden md:flex w-full md:w-80 glass-panel border-r border-white/10 flex-col shrink-0 fixed md:relative z-40 h-screen md:h-auto">
             <!-- Branding Header -->
             <div class="p-6 border-b border-white/10 flex items-center justify-between">
@@ -360,6 +360,9 @@
                                 <button onclick="setEditMode('highlight')" id="tool-highlight" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
                                     <i class="fa-solid fa-highlighter text-amber-400"></i> Highlight
                                 </button>
+                                <button onclick="setEditMode('whiteout')" id="tool-whiteout" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition" title="Erase or Cover text with Solid White Layer">
+                                    <i class="fa-solid fa-eraser text-red-400"></i> Whiteout / Erase
+                                </button>
                                 <button onclick="addRectangle()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
                                     <i class="fa-regular fa-square"></i> Shape
                                 </button>
@@ -380,7 +383,6 @@
                             </div>
 
                             <div class="flex items-center gap-2 border-l border-white/10 pl-4">
-                                <!-- Immersive Full Screen Toggle Mode Button -->
                                 <button id="fullscreen-btn" onclick="toggleFullscreenMode()" class="bg-slate-800 hover:bg-slate-700 border border-white/10 text-cyan-400 px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5" title="Toggle Immersive Full Screen View">
                                     <i class="fa-solid fa-expand"></i> Full Screen
                                 </button>
@@ -608,7 +610,7 @@
         };
 
         let currentPageNum = 1;
-        let isFullscreen = false; // Immersive Mode Status Tracker
+        let isFullscreen = false; 
 
         // Initialize Background Particle Floating Animations & Setup CORS Bypass on Load
         window.addEventListener('DOMContentLoaded', async () => {
@@ -654,7 +656,7 @@
             initSignaturePad();
         });
 
-        // 🛠 NEW CRITICAL FUNCTION: Immersive Fullscreen Workspace Mode Toggle Engine
+        // Immersive Fullscreen Workspace Mode Toggle Engine
         function toggleFullscreenMode() {
             const sidebar = document.getElementById('sidebar-panel');
             const header = document.getElementById('main-header');
@@ -670,7 +672,7 @@
                 sidebar.classList.remove('md:flex');
                 header.classList.add('hidden');
                 footer.classList.add('hidden');
-                thumbPanel.classList.add('hidden'); // Minimize thumbnail track on small mobile screens
+                thumbPanel.classList.add('hidden'); 
                 fullscreenBtn.innerHTML = `<i class="fa-solid fa-compress"></i> Exit Full Screen`;
                 fullscreenBtn.classList.remove('text-cyan-400');
                 fullscreenBtn.classList.add('bg-red-500/20', 'text-red-400', 'border-red-500/30');
@@ -687,7 +689,6 @@
                 showToast("Returned to Standard Layout", "info");
             }
 
-            // Trigger workspace canvas scale update loops to adapt dimensions immediately
             if (appState.pdfDoc) {
                 changeActivePage(currentPageNum);
             }
@@ -925,7 +926,7 @@
                             fontSize: fontSize,
                             fontFamily: 'sans-serif',
                             fill: '#000000', 
-                            backgroundColor: '#ffffff', // Mask old typography under crisp white bounds
+                            backgroundColor: '#ffffff', // Covers underlying text cleanly to avoid overlapping
                             borderColor: '#06b6d4',
                             cornerColor: '#06b6d4',
                             transparentCorners: false
@@ -977,6 +978,11 @@
                 fCanvas.isDrawingMode = true;
                 fCanvas.freeDrawingBrush.color = activeColor + "66"; 
                 fCanvas.freeDrawingBrush.width = activeWidth * 2.5;
+            } else if (mode === 'whiteout') {
+                // Whiteout / Erase tool using a solid white brush
+                fCanvas.isDrawingMode = true;
+                fCanvas.freeDrawingBrush.color = "#ffffff"; 
+                fCanvas.freeDrawingBrush.width = activeWidth * 5; // Extra wide brush for fast erase action
             } else if (mode === 'text') {
                 const text = new fabric.IText('New Text Layer', {
                     left: fCanvas.width / 2 - 50,
@@ -1133,20 +1139,34 @@
             }
         }
 
+        // 🛠 NEW REDESIGNED FLATTENING ENGINE: Exports absolute FULL HD PDF document sheet layers with ZERO text duplication
         async function compileAndExportPDF() {
             if (!appState.pdfBytes || !appState.pdfLibDoc) return;
-            showToast("Exporting modified PDF file...", "info");
+            showToast("Compiling Pristine Full HD PDF document...", "info");
             
             try {
-                const keys = Object.keys(appState.canvasInstances);
+                // Initialize a brand-new clean PDF document template
+                const cleanPdfDoc = await PDFLib.PDFDocument.create();
 
-                for (let key of keys) {
-                    const pageIndex = parseInt(key) - 1;
-                    const jsonState = appState.canvasInstances[key];
-                    
-                    if (jsonState) {
+                for (let i = 1; i <= appState.totalPages; i++) {
+                    let fCanvas = appState.canvasInstances[i];
+                    let pageImageBytes;
+                    let width, height;
+
+                    if (fCanvas && typeof fCanvas === 'object') {
+                        // Render the workspace viewport at high-density (2x zoom) for Full HD resolution
+                        const highResDataUrl = fCanvas.toDataURL({
+                            format: 'png',
+                            quality: 1.0,
+                            multiplier: 2.0 // Ensures ultra-sharp text assets
+                        });
+                        pageImageBytes = await fetch(highResDataUrl).then(res => res.arrayBuffer());
+                        width = fCanvas.width / (appState.zoomLevel * 1.5);
+                        height = fCanvas.height / (appState.zoomLevel * 1.5);
+                    } else if (fCanvas && typeof fCanvas === 'string') {
+                        // Temporarily reconstruct stringified canvas configurations for inactive pages
                         const tempCanvas = document.createElement('canvas');
-                        const page = await appState.pdfDoc.getPage(pageIndex + 1);
+                        const page = await appState.pdfDoc.getPage(i);
                         const viewport = page.getViewport({ scale: 2.0 }); 
                         tempCanvas.width = viewport.width;
                         tempCanvas.height = viewport.height;
@@ -1157,43 +1177,54 @@
                         });
 
                         await new Promise((resolve) => {
-                            fTempCanvas.loadFromJSON(jsonState, () => {
+                            fTempCanvas.loadFromJSON(fCanvas, () => {
                                 fTempCanvas.renderAll();
                                 resolve();
                             });
                         });
 
-                        fTempCanvas.setBackgroundImage(null, fTempCanvas.renderAll.bind(fTempCanvas));
-                        
-                        const items = fTempCanvas.getObjects();
-                        if (items.length > 0) {
-                            const overlayDataUrl = fTempCanvas.toDataURL({ format: 'png', quality: 1.0 });
-                            const overlayImageBytes = await fetch(overlayDataUrl).then(res => res.arrayBuffer());
-                            const embeddedImage = await appState.pdfLibDoc.embedPng(overlayImageBytes);
-
-                            const pdfLibPage = appState.pdfLibDoc.getPage(pageIndex);
-                            const { width, height } = pdfLibPage.getSize();
-
-                            pdfLibPage.drawImage(embeddedImage, {
-                                x: 0,
-                                y: 0,
-                                width: width,
-                                height: height,
-                                opacity: 1.0
-                            });
-                        }
+                        const highResDataUrl = fTempCanvas.toDataURL({ format: 'png', quality: 1.0 });
+                        pageImageBytes = await fetch(highResDataUrl).then(res => res.arrayBuffer());
+                        width = viewport.width / 2.0;
+                        height = viewport.height / 2.0;
                         fTempCanvas.dispose();
+                    } else {
+                        // Render standard clean original page if there are no modifications
+                        const page = await appState.pdfDoc.getPage(i);
+                        const viewport = page.getViewport({ scale: 2.0 });
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = viewport.width;
+                        tempCanvas.height = viewport.height;
+                        const ctx = tempCanvas.getContext('2d');
+
+                        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+                        const highResDataUrl = tempCanvas.toDataURL("image/png");
+                        pageImageBytes = await fetch(highResDataUrl).then(res => res.arrayBuffer());
+                        width = viewport.width / 2.0;
+                        height = viewport.height / 2.0;
                     }
+
+                    // Pack the HD canvas frames into our pristine output document
+                    const embeddedImage = await cleanPdfDoc.embedPng(pageImageBytes);
+                    const newPage = cleanPdfDoc.addPage([width, height]);
+                    newPage.drawImage(embeddedImage, {
+                        x: 0,
+                        y: 0,
+                        width: width,
+                        height: height
+                    });
                 }
 
-                const finalPdfBytes = await appState.pdfLibDoc.save();
+                const finalPdfBytes = await cleanPdfDoc.save();
                 const blob = new Blob([finalPdfBytes], { type: "application/pdf" });
                 const outName = appState.currentFileMetadata.name.replace(".pdf", "_edited_rasel.pdf");
                 saveAs(blob, outName);
-                showToast("Document saved!", "success");
+                
+                showToast("Full HD Document successfully compiled with ZERO overlaps!", "success");
             } catch (err) {
                 console.error(err);
-                showToast("Export aborted: " + err.message, "error");
+                showToast("Packaging Engine aborted: " + err.message, "error");
             }
         }
 
@@ -1492,7 +1523,6 @@
         function openKeyboardShortcuts() { document.getElementById('shortcuts-modal').classList.remove('hidden'); }
         function closeKeyboardShortcuts() { document.getElementById('shortcuts-modal').classList.add('hidden'); }
         
-        // Responsive sidebar controller
         function toggleSidebarMobile() { 
             const sidebar = document.getElementById('sidebar-panel');
             sidebar.classList.toggle('hidden');
