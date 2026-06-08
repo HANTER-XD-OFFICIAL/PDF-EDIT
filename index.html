@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD RASEL PDF STUDIO - Premium Futuristic Client-Side PDF Suite</title>
+    <title>MD RASEL PDF STUDIO - Premium Client-Side PDF Suite</title>
     
     <!-- CDNs for Styling & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Frontend Client-Side Libraries -->
+    <!-- Frontend Client-Side Libraries (Using Ultra-Stable PDF.js 2.16.105) -->
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -45,7 +45,6 @@
             overflow-x: hidden;
         }
         
-        /* Glassmorphism Classes */
         .glass-panel {
             background: rgba(15, 23, 42, 0.45);
             backdrop-filter: blur(16px);
@@ -66,16 +65,6 @@
             box-shadow: 0 0 25px rgba(6, 182, 212, 0.15);
         }
 
-        /* Glowing Effects */
-        .glow-cyan {
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
-        }
-        
-        .glow-purple {
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
-        }
-
-        /* Particles CSS Animation */
         @keyframes float-particle {
             0% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0; }
             10% { opacity: 0.4; }
@@ -91,7 +80,6 @@
             animation: float-particle 15s linear infinite;
         }
 
-        /* Scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -107,14 +95,12 @@
             background: rgba(6, 182, 212, 0.6);
         }
 
-        /* Splash Screen Fade Out */
         .splash-fade {
             opacity: 0;
             pointer-events: none;
             transition: all 0.8s ease;
         }
 
-        /* Keyboard Shortcut Hint Tag Style */
         .kbd-key {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -142,7 +128,7 @@
             <h1 class="font-display text-3xl font-bold tracking-wider text-white bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">MD RASEL PDF STUDIO</h1>
             <p class="text-slate-400 text-sm tracking-widest uppercase mt-2">Next-Gen Web OS PDF Engine</p>
             <div class="w-48 h-1 bg-slate-800 rounded-full mt-6 mx-auto overflow-hidden relative">
-                <div class="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-400 to-purple-500 w-1/2 rounded-full animate-[loading_2s_infinite_linear]" style="animation: splashLoad 1.5s infinite ease-in-out;"></div>
+                <div class="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-400 to-purple-500 w-1/2 rounded-full" style="animation: splashLoad 1.5s infinite ease-in-out;"></div>
             </div>
         </div>
     </div>
@@ -205,24 +191,20 @@
                 <!-- Recent Files Feed -->
                 <div class="px-3 py-2 text-xs text-slate-400 font-medium">Recent Files</div>
                 <div id="recent-files-list" class="space-y-1.5 px-1 max-h-48 overflow-y-auto">
-                    <!-- Dynamic List Populated Via LocalStorage -->
                     <div class="text-[11px] text-slate-500 italic p-2 text-center">No recent files in cache.</div>
                 </div>
 
                 <div class="text-[10px] text-slate-500 font-bold uppercase tracking-widest px-3 pt-6 mb-2">Preferences</div>
                 
-                <!-- Language Selector Mock Option -->
                 <div class="px-3 flex items-center justify-between text-xs text-slate-400">
                     <span>Language</span>
                     <select id="lang-select" onchange="changeLanguage()" class="bg-slate-900 border border-white/10 text-xs text-slate-300 rounded px-2 py-1 outline-none focus:border-cyan-400">
                         <option value="en">English (US)</option>
-                        <option value="es">Español</option>
                         <option value="bn">বাংলা (Bengali)</option>
                     </select>
                 </div>
             </nav>
 
-            <!-- Sticky Sidebar Footer -->
             <div class="p-4 border-t border-white/10 glass-panel bg-slate-950/80">
                 <div class="flex items-center justify-between text-xs text-slate-400">
                     <span class="flex items-center gap-1.5">
@@ -256,10 +238,9 @@
                         <p id="view-subtitle" class="text-xs text-slate-400">Central workspace management & analytics overview</p>
                     </div>
                 </div>
-                <!-- Dynamic Status Widgets -->
                 <div class="flex items-center gap-4">
                     <div id="file-size-badge" class="hidden md:flex items-center gap-2 bg-cyan-950/30 border border-cyan-500/20 px-3 py-1.5 rounded-lg text-xs text-cyan-400">
-                        <i class="fa-solid fa-database text-xs animate-bounce"></i>
+                        <i class="fa-solid fa-database text-xs"></i>
                         <span>Active: <strong id="active-file-size">0 MB</strong></span>
                     </div>
                     <div class="bg-slate-900 border border-white/10 rounded-xl px-4 py-1.5 text-xs text-slate-300 flex items-center gap-2">
@@ -274,13 +255,12 @@
 
                 <!-- SCREEN 1: STUDIO DASHBOARD -->
                 <section id="dashboard-tab" class="tab-screen space-y-8">
-                    <!-- Premium Landing Promo Banner -->
                     <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-600/20 to-purple-600/20 border border-cyan-500/20 p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                         <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_120%,rgba(168,85,247,0.15),transparent)] pointer-events-none"></div>
                         <div class="space-y-3 max-w-xl">
                             <span class="bg-cyan-950 border border-cyan-400/30 text-cyan-400 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Client-Side Engine</span>
-                            <h2 class="text-2xl md:text-3xl font-display font-bold tracking-tight text-white">Full-Featured PDF manipulation without backend latency or privacy hazards.</h2>
-                            <p class="text-slate-400 text-sm leading-relaxed">Your data never leaves your device. All rendering, compilation, editing, and image extraction routines happen 100% locally inside your web browser environment.</p>
+                            <h2 class="text-2xl md:text-3xl font-display font-bold tracking-tight text-white">Edit Any PDF Layer Directly & Export Flawlessly</h2>
+                            <p class="text-slate-400 text-sm leading-relaxed">Modify existing text, change layouts, overwrite images, draw vectors, and export high-quality outcomes instantly inside your browser.</p>
                         </div>
                         <button onclick="switchTab('editor-tab')" class="shrink-0 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white font-semibold text-sm px-6 py-3.5 rounded-xl transition duration-300 shadow-lg shadow-cyan-500/20 flex items-center gap-2 group">
                             Launch Dynamic Editor
@@ -290,48 +270,29 @@
 
                     <!-- Core Suite Features Feature Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Card 1 -->
                         <div class="glass-card rounded-2xl p-6 relative group overflow-hidden cursor-pointer" onclick="switchTab('editor-tab')">
                             <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-6 group-hover:bg-cyan-500/20 transition-all">
-                                <i class="fa-solid fa-file-signature text-xl"></i>
+                                <i class="fa-solid fa-font text-xl"></i>
                             </div>
-                            <h3 class="font-display font-bold text-lg text-white mb-2">Signature & Overlays</h3>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-4">Digitally sign documents, draw shapes, and place customized typography onto the layout plane of any standard document container.</p>
-                            <span class="text-xs text-cyan-400 font-semibold group-hover:underline flex items-center gap-1">Open Engine <i class="fa-solid fa-chevron-right text-[9px]"></i></span>
+                            <h3 class="font-display font-bold text-lg text-white mb-2">Edit Text & Layers</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-4">Double-click on any loaded text blocks within the PDF document layout to dynamically modify or replace them.</p>
+                            <span class="text-xs text-cyan-400 font-semibold group-hover:underline flex items-center gap-1">Open Editor <i class="fa-solid fa-chevron-right text-[9px]"></i></span>
                         </div>
-                        <!-- Card 2 -->
                         <div class="glass-card rounded-2xl p-6 relative group overflow-hidden cursor-pointer" onclick="switchTab('editor-tab')">
                             <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-6 group-hover:bg-purple-500/20 transition-all">
-                                <i class="fa-solid fa-scissors text-xl"></i>
+                                <i class="fa-solid fa-image text-xl"></i>
                             </div>
-                            <h3 class="font-display font-bold text-lg text-white mb-2">Reorganize & Rotate</h3>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-4">Seamlessly shift index orders, extract pages, discard redundant screens, and flip components 90° horizontally or vertically with instantaneous response times.</p>
-                            <span class="text-xs text-purple-400 font-semibold group-hover:underline flex items-center gap-1">Open Structuring <i class="fa-solid fa-chevron-right text-[9px]"></i></span>
+                            <h3 class="font-display font-bold text-lg text-white mb-2">Image Replacement</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-4">Upload new photos, logos, or signatures to overlay, mask, or replace older visual resources on any page.</p>
+                            <span class="text-xs text-purple-400 font-semibold group-hover:underline flex items-center gap-1">Insert Images <i class="fa-solid fa-chevron-right text-[9px]"></i></span>
                         </div>
-                        <!-- Card 3 -->
                         <div class="glass-card rounded-2xl p-6 relative group overflow-hidden cursor-pointer" onclick="switchTab('converter-tab')">
                             <div class="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 mb-6 group-hover:bg-pink-500/20 transition-all">
-                                <i class="fa-solid fa-arrows-spin text-xl"></i>
+                                <i class="fa-solid fa-file-image text-xl"></i>
                             </div>
                             <h3 class="font-display font-bold text-lg text-white mb-2">Raster PNG Exporter</h3>
-                            <p class="text-slate-400 text-sm leading-relaxed mb-4">Export specific layout regions or compile every isolated structural page of your input documents directly into pristine, high-resolution PNG archives.</p>
-                            <span class="text-xs text-pink-400 font-semibold group-hover:underline flex items-center gap-1">Open Converter <i class="fa-solid fa-chevron-right text-[9px]"></i></span>
-                        </div>
-                    </div>
-
-                    <!-- Client Security Banner / FAQ -->
-                    <div class="p-6 rounded-2xl glass-card flex flex-col md:flex-row items-center gap-6 justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="text-4xl text-cyan-400">
-                                <i class="fa-solid fa-shield-halved"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-white">Full Privacy Safe Mode Enabled</h4>
-                                <p class="text-slate-400 text-xs">Files loaded into MD RASEL PDF STUDIO are strictly handled within local application memory. Zero server uploads.</p>
-                            </div>
-                        </div>
-                        <div class="text-xs text-slate-500">
-                            Current Session Hash: <code class="text-slate-400 font-mono">MD-E2D-CLIENT-ON-GH</code>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-4">Extract layout pages cleanly to crisp PNG raster files without compression artifacts.</p>
+                            <span class="text-xs text-pink-400 font-semibold group-hover:underline flex items-center gap-1">Launch Converter <i class="fa-solid fa-chevron-right text-[9px]"></i></span>
                         </div>
                     </div>
                 </section>
@@ -376,14 +337,18 @@
                         
                         <!-- Floating Intelligent Controls Ribbon -->
                         <div class="glass-panel p-4 rounded-xl flex flex-wrap items-center justify-between gap-4 border border-white/10 sticky top-0 z-30">
-                            <!-- Editing Brush and Vector Elements Controls -->
                             <div class="flex flex-wrap items-center gap-2">
                                 <button onclick="setEditMode('select')" id="tool-select" class="tool-btn bg-cyan-500 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
-                                    <i class="fa-solid fa-arrow-pointer"></i> Select
+                                    <i class="fa-solid fa-arrow-pointer"></i> Select/Edit
                                 </button>
                                 <button onclick="setEditMode('text')" id="tool-text" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
-                                    <i class="fa-solid fa-font"></i> Text
+                                    <i class="fa-solid fa-font"></i> Add Text
                                 </button>
+                                <button onclick="triggerImageUpload()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                    <i class="fa-solid fa-image"></i> Insert Image
+                                </button>
+                                <input type="file" id="image-loader-input" accept="image/*" class="hidden" onchange="insertImageOnCanvas(event)">
+                                
                                 <button onclick="setEditMode('draw')" id="tool-draw" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
                                     <i class="fa-solid fa-pen"></i> Brush
                                 </button>
@@ -398,24 +363,22 @@
                                 </button>
                             </div>
 
-                            <!-- Color, Stroke Brush and Node Adjustments -->
                             <div class="flex items-center gap-4 border-l border-white/10 pl-4">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[10px] text-slate-400 uppercase font-semibold">Tint</span>
-                                    <input type="color" id="tool-color" value="#06b6d4" onchange="updateBrushProperties()" class="w-7 h-7 bg-transparent border border-white/10 rounded cursor-pointer">
+                                    <span class="text-[10px] text-slate-400 uppercase font-semibold">Color</span>
+                                    <input type="color" id="tool-color" value="#000000" onchange="updateBrushProperties()" class="w-7 h-7 bg-transparent border border-white/10 rounded cursor-pointer">
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[10px] text-slate-400 uppercase font-semibold">Width</span>
-                                    <input type="range" id="tool-width" min="1" max="50" value="5" onchange="updateBrushProperties()" class="w-16 accent-cyan-400">
+                                    <span class="text-[10px] text-slate-400 uppercase font-semibold">Size</span>
+                                    <input type="range" id="tool-width" min="1" max="50" value="4" onchange="updateBrushProperties()" class="w-16 accent-cyan-400">
                                 </div>
                             </div>
 
-                            <!-- View Optimization Controls (Rotate, Zoom, Operations) -->
                             <div class="flex items-center gap-2 border-l border-white/10 pl-4">
-                                <button onclick="rotateActivePage()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg text-xs" title="Rotate Page 90° clockwise">
+                                <button onclick="rotateActivePage()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg text-xs" title="Rotate Page 90°">
                                     <i class="fa-solid fa-rotate-right"></i>
                                 </button>
-                                <button onclick="deleteActivePage()" class="bg-red-950/20 hover:bg-red-900/30 text-red-400 border border-red-500/10 p-2 rounded-lg text-xs" title="Delete Active Page">
+                                <button onclick="deleteActivePage()" class="bg-red-950/20 hover:bg-red-900/30 text-red-400 border border-red-500/10 p-2 rounded-lg text-xs" title="Delete Page">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                                 <div class="h-6 w-px bg-white/10 mx-1"></div>
@@ -427,10 +390,9 @@
                                 </button>
                             </div>
 
-                            <!-- Structural Undo-Redo & Target Output Compile Button -->
                             <div class="flex items-center gap-2">
                                 <button onclick="clearCurrentCanvas()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-2 rounded-lg text-xs" title="Clear Canvas Layer">
-                                    <i class="fa-solid fa-eraser"></i> Clear Canvas
+                                    <i class="fa-solid fa-eraser"></i> Clear
                                 </button>
                                 <button onclick="compileAndExportPDF()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs px-5 py-2 rounded-lg transition shadow-lg shadow-emerald-500/10 flex items-center gap-1.5">
                                     <i class="fa-solid fa-file-export animate-pulse"></i> Apply & Export PDF
@@ -438,15 +400,12 @@
                             </div>
                         </div>
 
-                        <!-- Core Editor View: Sidebar Thumbnails + Main Rendering Canvas -->
+                        <!-- Core Editor View -->
                         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-                            
                             <!-- Left: Interactive Structural Thumbnails -->
                             <div class="glass-panel p-4 rounded-xl border border-white/10 flex flex-col gap-4 max-h-[70vh] overflow-y-auto lg:col-span-1">
                                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Page Structure Layout</h4>
-                                <div id="thumbnails-container" class="space-y-4">
-                                    <!-- Dynamic Render Feed of Viewport Canvas Overviews -->
-                                </div>
+                                <div id="thumbnails-container" class="space-y-4"></div>
                             </div>
 
                             <!-- Right: The Sandbox Layer Overlay Viewer -->
@@ -461,7 +420,6 @@
 
                                 <!-- The Fabric.js Sandbox Wrapper viewport container -->
                                 <div id="workspace-canvas-wrapper" class="relative bg-slate-900 border border-white/15 rounded-xl overflow-hidden flex items-center justify-center p-6 shadow-2xl">
-                                    <!-- Background rendering container dynamically instantiated via code -->
                                     <canvas id="active-pdf-canvas" class="shadow-lg"></canvas>
                                 </div>
                             </div>
@@ -473,8 +431,6 @@
 
                 <!-- SCREEN 3: PDF TO PNG CONVERTER -->
                 <section id="converter-tab" class="tab-screen hidden space-y-6">
-                    
-                    <!-- File Drag & Drop Target Zone (Converter View) -->
                     <div id="drop-zone-converter" class="border-2 border-dashed border-white/10 hover:border-pink-500/50 bg-slate-900/40 rounded-2xl p-12 text-center transition-all cursor-pointer relative overflow-hidden group">
                         <div class="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <input type="file" id="converter-file-input" accept="application/pdf" class="hidden">
@@ -514,7 +470,6 @@
                             </div>
                             
                             <div class="flex flex-wrap items-center gap-4">
-                                <!-- Scale Resolution Selection -->
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs text-slate-400">Scale DPI:</span>
                                     <select id="png-scale" class="bg-slate-900 border border-white/10 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-pink-500">
@@ -525,7 +480,6 @@
                                     </select>
                                 </div>
 
-                                <!-- Extraction Range selection button sets -->
                                 <div class="flex items-center gap-2 bg-slate-900 border border-white/10 p-1.5 rounded-lg">
                                     <button onclick="setExportRange('all')" id="btn-range-all" class="bg-pink-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition">
                                         All Pages
@@ -535,7 +489,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Execute compile run button selection -->
                                 <button onclick="executePNGExport()" class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-lg shadow-pink-500/10 flex items-center gap-2 transition duration-300">
                                     <i class="fa-solid fa-cloud-arrow-down"></i> Export PNG Pack (.zip)
                                 </button>
@@ -549,9 +502,7 @@
                                 <span class="text-xs text-slate-400">Total Loaded Target Canvas Elements: <strong id="converter-count" class="text-pink-400">0</strong></span>
                             </div>
                             
-                            <div id="converter-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                <!-- Grid populated programmatically using custom script mechanics -->
-                            </div>
+                            <div id="converter-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
                         </div>
                     </div>
                 </section>
@@ -614,10 +565,6 @@
                     <span class="kbd-key">T</span>
                 </div>
                 <div class="flex justify-between items-center py-1.5 border-b border-white/5">
-                    <span class="text-slate-400">Brush Mode</span>
-                    <span class="kbd-key">B</span>
-                </div>
-                <div class="flex justify-between items-center py-1.5 border-b border-white/5">
                     <span class="text-slate-400">Delete Key Element</span>
                     <span class="kbd-key">Del / Backspace</span>
                 </div>
@@ -635,25 +582,22 @@
 
     <!-- COMPLETE ENGINE JAVASCRIPT LOGIC WORKSPACE -->
     <script>
-        // Set worker endpoint safely. We initialize this properly below.
         pdfjsLib.GlobalWorkerOptions.workerSrc = '';
 
-        // GLOBAL APPLICATION SYSTEM STATE OBJECT
         let appState = {
-            pdfDoc: null,         // Original pdfjsLib parsed document reference
-            pdfBytes: null,       // Original input ArrayBuffer array for editing compilation
-            pdfLibDoc: null,      // PDF-Lib parsed memory document instantiation
-            currentPageNum: 1,    // Single numerical track cursor pointer
-            totalPages: 0,        // Absolute boundaries tracking metadata
-            zoomLevel: 1.0,       // Absolute structural zoom modifier
-            editMode: 'select',   // Active element interactions select pointer brush state
-            canvasInstances: {},  // Page numeric maps containing unique operational instances
-            selectedExportPages: [], // PDF To PNG custom user range tracking vector arrays
-            exportRangeMode: 'all',  // Conversion selection target indicator ('all' or 'selected')
+            pdfDoc: null,         
+            pdfBytes: null,       
+            pdfLibDoc: null,      
+            currentPageNum: 1,    
+            totalPages: 0,        
+            zoomLevel: 1.0,       
+            editMode: 'select',   
+            canvasInstances: {},  
+            selectedExportPages: [], 
+            exportRangeMode: 'all',  
             currentFileMetadata: { name: "", size: 0, rawBytes: null }
         };
 
-        // UI View Shortcuts Reference Hookup
         let currentPageNum = 1;
 
         // Initialize Background Particle Floating Animations & Setup CORS Bypass on Load
@@ -671,66 +615,52 @@
                 container.appendChild(particle);
             }
 
-            // 🛠 CORS BYPASS FOR GITHUB PAGES: Fetch and load PDF worker script inside Blob URL
+            // 🛠 CORS BYPASS INLINE WORKER FOR MOBILES: Spawns the PDF.js Web Worker using an inline base Blob URL
             try {
-                const workerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-                const response = await fetch(workerUrl);
-                const workerBlob = await response.blob();
-                const workerBlobUrl = URL.createObjectURL(workerBlob);
+                const workerScript = `importScripts("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js");`;
+                const blob = new Blob([workerScript], { type: 'application/javascript' });
+                const workerBlobUrl = URL.createObjectURL(blob);
                 pdfjsLib.GlobalWorkerOptions.workerSrc = workerBlobUrl;
-                console.log("PDF.js Worker compiled internally successfully.");
+                console.log("Internal Blob-Worker initialized cleanly.");
             } catch (err) {
-                console.warn("Failed to load worker via blob. Falling back to direct script.", err);
-                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                console.warn("Blob Worker fallback trigger.", err);
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
             }
             
-            // Auto fade out transition screen layer
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 splash.classList.add('splash-fade');
-                showToast("MD RASEL PDF STUDIO loaded", "success");
+                showToast("MD RASEL PDF STUDIO Ready", "success");
             }, 1200);
 
-            // Handle live clock widget cycle runs
             setInterval(() => {
                 const date = new Date();
                 document.getElementById('live-time').innerText = date.toLocaleTimeString();
             }, 1000);
 
-            // Set dynamic drag drop target area event listener bindings
             setupDragDropZone('drop-zone-editor', 'editor-file-input', loadPDFInWorkspace);
             setupDragDropZone('drop-zone-converter', 'converter-file-input', loadPDFInConverter);
 
-            // Fetch dynamic local storage updates on load
             populateRecentFiles();
-
-            // Setup custom electronic drawing touch signature pad
             initSignaturePad();
         });
 
-        // Dynamic System Language Switch Mod Hooks
         function changeLanguage() {
             const lang = document.getElementById('lang-select').value;
             if (lang === 'bn') {
                 document.getElementById('view-title').innerText = "স্টুডিও ড্যাশবোর্ড";
-                document.getElementById('view-subtitle').innerText = "সেন্ট্রাল ওয়ার্কস্পেস ম্যানেজমেন্ট এবং অ্যানালিটিক্স";
-                showToast("বাংলা ভাষা নির্বাচন করা হয়েছে", "success");
-            } else if (lang === 'es') {
-                document.getElementById('view-title').innerText = "Panel de Control";
-                document.getElementById('view-subtitle').innerText = "Gestión central del espacio de trabajo y análisis";
-                showToast("Idioma cambiado a Español", "success");
+                document.getElementById('view-subtitle').innerText = "সেন্ট্রাল ওয়ার্কস্পেস ম্যানেজমেন্ট";
+                showToast("ভাষা পরিবর্তন করা হয়েছে", "success");
             } else {
                 document.getElementById('view-title').innerText = "Studio Dashboard";
-                document.getElementById('view-subtitle').innerText = "Central workspace management & analytics overview";
-                showToast("Language updated to English", "success");
+                document.getElementById('view-subtitle').innerText = "Central workspace management & analytics";
+                showToast("Language changed to English", "success");
             }
         }
 
-        // Custom Toast Notifications Logic
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            
             let iconClass = "fa-circle-info text-cyan-400";
             let borderColor = "border-cyan-500/20";
             if (type === 'success') {
@@ -742,23 +672,16 @@
             }
 
             toast.className = `glass-panel px-4 py-3 rounded-xl border ${borderColor} flex items-center gap-3 transition-all duration-300 transform translate-y-2 opacity-0 shadow-lg`;
-            toast.innerHTML = `
-                <i class="fa-solid ${iconClass}"></i>
-                <span class="text-xs text-slate-200 font-medium">${message}</span>
-            `;
+            toast.innerHTML = `<i class="fa-solid ${iconClass}"></i><span class="text-xs text-slate-200 font-medium">${message}</span>`;
             
             container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 50);
-
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 50);
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-[-10px]');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
-        // Global Sidebar Menu Tab Operations switches
         function switchTab(tabId) {
             document.querySelectorAll('.tab-screen').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-tab').forEach(el => {
@@ -768,57 +691,27 @@
             document.getElementById(tabId).classList.remove('hidden');
             const targetBtn = document.getElementById(`btn-${tabId}`);
             targetBtn.className = "nav-tab active-tab w-full flex items-center justify-between px-4 py-3 rounded-xl transition text-left text-sm bg-gradient-to-r from-cyan-500/10 to-transparent border-l-4 border-cyan-400 text-cyan-400";
-            
-            const headTitle = document.getElementById('view-title');
-            const headSub = document.getElementById('view-subtitle');
-            
-            if (tabId === 'dashboard-tab') {
-                headTitle.innerText = "Studio Dashboard";
-                headSub.innerText = "Central workspace management & analytics overview";
-            } else if (tabId === 'editor-tab') {
-                headTitle.innerText = "PDF Interactive Editor";
-                headSub.innerText = "Digitize layers, apply signatures and change layouts directly";
-            } else if (tabId === 'converter-tab') {
-                headTitle.innerText = "PDF to PNG Converter";
-                headSub.innerText = "Generate and extract raster images from document files";
-            }
         }
 
-        // Drag and Drop Zone Target Utility
         function setupDragDropZone(zoneId, inputId, onFileSelected) {
             const zone = document.getElementById(zoneId);
             const input = document.getElementById(inputId);
-
-            zone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                zone.classList.add('border-cyan-400');
-            });
-
-            zone.addEventListener('dragleave', () => {
-                zone.classList.remove('border-cyan-400');
-            });
-
+            zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('border-cyan-400'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('border-cyan-400'));
             zone.addEventListener('drop', (e) => {
                 e.preventDefault();
                 zone.classList.remove('border-cyan-400');
                 if (e.dataTransfer.files.length > 0) {
                     const file = e.dataTransfer.files[0];
-                    if (file.type === 'application/pdf') {
-                        onFileSelected(file);
-                    } else {
-                        showToast("Invalid format, please load target PDF container", "error");
-                    }
+                    if (file.type === 'application/pdf') onFileSelected(file);
+                    else showToast("Please upload a valid PDF file", "error");
                 }
             });
-
             input.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    onFileSelected(e.target.files[0]);
-                }
+                if (e.target.files.length > 0) onFileSelected(e.target.files[0]);
             });
         }
 
-        // Dynamic File Size Formatting Utility
         function formatBytes(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -834,29 +727,22 @@
 
         async function loadPDFInWorkspace(file) {
             try {
-                // Initialize workspace loading loader indicator animations
                 document.getElementById('drop-zone-editor').classList.add('hidden');
                 const loader = document.getElementById('editor-loader');
                 loader.classList.remove('hidden');
                 document.getElementById('editor-progress-bar').style.width = '30%';
 
-                appState.currentFileMetadata = {
-                    name: file.name,
-                    size: file.size,
-                    rawBytes: file
-                };
+                appState.currentFileMetadata = { name: file.name, size: file.size, rawBytes: file };
 
-                // Read bytes to local ArrayBuffer representation
                 const reader = new FileReader();
                 reader.onload = async function() {
                     try {
                         const arrayBuffer = this.result;
                         appState.pdfBytes = arrayBuffer;
 
-                        // Execute pdf.js and pdf-lib memory loading routines
                         document.getElementById('editor-progress-bar').style.width = '60%';
                         
-                        // 🛠 Uint8Array Conversion to ensure maximum browser stability
+                        // 🛠 Mobile Stable parsing with typed arrays
                         const typedArray = new Uint8Array(arrayBuffer);
                         appState.pdfDoc = await pdfjsLib.getDocument({ data: typedArray }).promise;
                         appState.pdfLibDoc = await PDFLib.PDFDocument.load(arrayBuffer);
@@ -864,15 +750,12 @@
                         appState.totalPages = appState.pdfDoc.numPages;
                         currentPageNum = 1;
 
-                        // Update System Metadata Display Dashboard Badges
                         document.getElementById('file-size-badge').classList.remove('hidden');
                         document.getElementById('active-file-size').innerText = formatBytes(file.size);
 
-                        // Render dynamic preview thumbnails list
                         document.getElementById('editor-progress-bar').style.width = '80%';
                         await buildEditorThumbnails();
 
-                        // Instantiation workspace active canvas frame render
                         document.getElementById('editor-progress-bar').style.width = '100%';
                         setTimeout(() => {
                             loader.classList.add('hidden');
@@ -880,29 +763,26 @@
                             document.getElementById('editor-workspace').classList.add('flex');
                             changeActivePage(1);
                             saveRecentFileRecord(file.name, file.size);
-                            showToast("Document loaded into Workspace Environment", "success");
+                            showToast("PDF parsed and text layers mapped successfully", "success");
                         }, 400);
-                    } catch (parseError) {
-                        console.error(parseError);
-                        showToast("Error parsing file structure: " + parseError.message, "error");
+                    } catch (parseErr) {
+                        console.error(parseErr);
+                        showToast("Error parsing file layout elements: " + parseErr.message, "error");
                         document.getElementById('drop-zone-editor').classList.remove('hidden');
                         document.getElementById('editor-loader').classList.add('hidden');
                     }
                 };
                 reader.readAsArrayBuffer(file);
             } catch (err) {
-                console.error(err);
                 showToast("Error processing PDF: " + err.message, "error");
                 document.getElementById('drop-zone-editor').classList.remove('hidden');
                 document.getElementById('editor-loader').classList.add('hidden');
             }
         }
 
-        // Build left-side dynamic document structure preview layout cards
         async function buildEditorThumbnails() {
             const container = document.getElementById('thumbnails-container');
             container.innerHTML = '';
-
             for (let i = 1; i <= appState.totalPages; i++) {
                 const thumbWrapper = document.createElement('div');
                 thumbWrapper.id = `thumb-page-${i}`;
@@ -912,20 +792,15 @@
                 const canvas = document.createElement('canvas');
                 canvas.className = "w-full rounded bg-slate-900";
                 
-                // Read scaling for quick low-profile thumbnail render
                 const page = await appState.pdfDoc.getPage(i);
                 const viewport = page.getViewport({ scale: 0.25 });
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
 
-                const renderContext = {
-                    canvasContext: canvas.getContext('2d'),
-                    viewport: viewport
-                };
+                const renderContext = { canvasContext: canvas.getContext('2d'), viewport: viewport };
                 await page.render(renderContext).promise;
 
                 thumbWrapper.appendChild(canvas);
-
                 const meta = document.createElement('div');
                 meta.className = "text-[10px] text-slate-400 font-semibold";
                 meta.innerText = `Page ${i}`;
@@ -935,11 +810,9 @@
             }
         }
 
-        // Handle Active Working Screen Frame Render Loop
         async function changeActivePage(pageNum) {
             if (pageNum < 1 || pageNum > appState.totalPages) return;
             
-            // Highlight thumbnail indicators
             document.querySelectorAll('#thumbnails-container > div').forEach(el => {
                 el.classList.remove('border-cyan-400', 'bg-cyan-950/20');
             });
@@ -950,7 +823,6 @@
             document.getElementById('active-page-number').innerText = pageNum;
             document.getElementById('total-pages-number').innerText = appState.totalPages;
 
-            // Render page background layer elements inside Sandbox Wrapper canvas viewports
             const page = await appState.pdfDoc.getPage(pageNum);
             const viewport = page.getViewport({ scale: appState.zoomLevel * 1.5 });
             
@@ -959,79 +831,82 @@
             activeCanvas.width = viewport.width;
             activeCanvas.height = viewport.height;
 
-            const renderContext = {
-                canvasContext: ctx,
-                viewport: viewport
-            };
+            const renderContext = { canvasContext: ctx, viewport: viewport };
             await page.render(renderContext).promise;
 
-            // Initialize or retrieve Fabric JS interactive canvas layers over target canvas
-            initFabricLayer(activeCanvas, pageNum);
+            // Render interactive fabric overlay and auto-extract text
+            await initFabricLayerAndParseText(activeCanvas, page, viewport);
         }
 
-        // Initialize Fabric.JS layer overlay on top of standard pdf page context canvas
-        function initFabricLayer(targetCanvas, pageNum) {
+        // 🛠 NEW CRITICAL FUNCTION: RENDERS PDF BACKGROUND, GENERATES COVER LAYERS & EXTRACTS EDITABLE TEXT
+        async function initFabricLayerAndParseText(targetCanvas, pdfPage, viewport) {
             const wrapper = document.getElementById('workspace-canvas-wrapper');
-            
-            // Remove previous active Fabric element container wraps
             const existingContainer = wrapper.querySelector('.canvas-container');
+            
             if (existingContainer) {
                 existingContainer.remove();
-                // Append original clean canvas back to DOM node
                 const cleanCanvas = document.createElement('canvas');
                 cleanCanvas.id = 'active-pdf-canvas';
                 cleanCanvas.className = "shadow-lg";
                 wrapper.appendChild(cleanCanvas);
-                // Recursive self call once container clean to avoid canvas clone duplicates
-                initFabricLayer(cleanCanvas, pageNum);
+                await initFabricLayerAndParseText(cleanCanvas, pdfPage, viewport);
                 return;
             }
 
-            // Create high density backing target frame
             const backingImage = targetCanvas.toDataURL("image/png");
-
-            // Instantiate Fabric.Canvas framework elements on background canvas wrapper structures
             const fCanvas = new fabric.Canvas('active-pdf-canvas', {
                 width: targetCanvas.width,
                 height: targetCanvas.height
             });
 
-            // Set background texture to match PDF page layout
-            fabric.Image.fromURL(backingImage, function(img) {
-                fCanvas.setBackgroundImage(img, fCanvas.renderAll.bind(fCanvas));
-            });
+            fCanvas.setBackgroundImage(backingImage, fCanvas.renderAll.bind(fCanvas));
 
-            // Load saved changes object models from local application cache if they exist
-            if (appState.canvasInstances[pageNum]) {
-                fCanvas.loadFromJSON(appState.canvasInstances[pageNum], () => {
+            // Load from cache or extract from scratch
+            if (appState.canvasInstances[currentPageNum]) {
+                fCanvas.loadFromJSON(appState.canvasInstances[currentPageNum], () => {
                     fCanvas.renderAll();
                 });
+            } else {
+                // Parse and map textual nodes onto editable text assets
+                try {
+                    const textContent = await pdfPage.getTextContent();
+                    textContent.items.forEach(item => {
+                        if (!item.str.trim()) return;
+
+                        // Map coordinates cleanly
+                        const [x, y] = viewport.convertToViewportPoint(item.transform[4], item.transform[5]);
+                        const fontSize = Math.abs(item.transform[0] || item.transform[3] || 12) * appState.zoomLevel * 1.5;
+
+                        // Create the text element
+                        const editableText = new fabric.IText(item.str, {
+                            left: x,
+                            top: y - fontSize, // Align to top-left coordinate system
+                            fontSize: fontSize,
+                            fontFamily: 'sans-serif',
+                            fill: document.getElementById('tool-color').value === '#000000' ? '#000000' : document.getElementById('tool-color').value,
+                            backgroundColor: '#ffffff', // Covers the original printed background layer cleanly
+                            borderColor: '#06b6d4',
+                            cornerColor: '#06b6d4',
+                            transparentCorners: false
+                        });
+
+                        fCanvas.add(editableText);
+                    });
+                    fCanvas.renderAll();
+                } catch (err) {
+                    console.warn("Text layout mapping bypassed: " + err.message);
+                }
             }
 
-            appState.canvasInstances[pageNum] = fCanvas;
+            appState.canvasInstances[currentPageNum] = fCanvas;
 
-            // Force dynamic binding system properties on elements change and canvas modifications
             fCanvas.on('after:render', () => {
-                // Keep memory buffer object active maps updated dynamically
-                appState.canvasInstances[pageNum] = JSON.stringify(fCanvas.toJSON());
+                appState.canvasInstances[currentPageNum] = JSON.stringify(fCanvas.toJSON());
             });
 
-            // Bind global canvas delete keyboard hooks
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Delete' || e.key === 'Backspace') {
-                    const activeObj = fCanvas.getActiveObject();
-                    if (activeObj && !activeObj.isEditing) {
-                        fCanvas.remove(activeObj);
-                        fCanvas.requestRenderAll();
-                    }
-                }
-            });
-
-            // Set immediate workspace control brush styles
             setEditMode(appState.editMode);
         }
 
-        // Master switch controls mode toggles
         function setEditMode(mode) {
             appState.editMode = mode;
             document.querySelectorAll('.tool-btn').forEach(el => {
@@ -1043,11 +918,9 @@
                 targetBtn.className = "tool-btn bg-cyan-500 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition";
             }
 
-            // Retrieve current target Fabric JS instance context
             const fCanvas = getActiveFabricInstance();
             if (!fCanvas) return;
 
-            // Reset core states on structural change
             fCanvas.isDrawingMode = false;
             fCanvas.selection = true;
             fCanvas.forEachObject(o => o.selectable = o.evented = true);
@@ -1061,43 +934,35 @@
                 fCanvas.freeDrawingBrush.width = activeWidth;
             } else if (mode === 'highlight') {
                 fCanvas.isDrawingMode = true;
-                // Add translucent rendering capabilities for document layout highlighter tools
-                fCanvas.freeDrawingBrush.color = activeColor + "66"; // Translucent alpha channel appending hex code
-                fCanvas.freeDrawingBrush.width = activeWidth * 2;
+                fCanvas.freeDrawingBrush.color = activeColor + "66"; // Translucent stroke hex code
+                fCanvas.freeDrawingBrush.width = activeWidth * 2.5;
             } else if (mode === 'text') {
-                // Insert editable dynamic text input bounding frame
-                const text = new fabric.IText('Double click to edit', {
-                    left: fCanvas.width / 2 - 100,
+                const text = new fabric.IText('New Text Layer', {
+                    left: fCanvas.width / 2 - 50,
                     top: fCanvas.height / 2 - 15,
                     fontFamily: 'Plus Jakarta Sans',
                     fill: activeColor,
-                    fontSize: 24,
+                    fontSize: 22,
                     borderColor: '#06b6d4',
                     cornerColor: '#06b6d4'
                 });
                 fCanvas.add(text);
                 fCanvas.setActiveObject(text);
-                appState.editMode = 'select'; // Toggle mode back directly to selection tool state
                 setEditMode('select');
             }
         }
 
-        // Retrieve current active memory container elements
         function getActiveFabricInstance() {
             const canvasWrapper = document.getElementById('workspace-canvas-wrapper');
             const fabricCanvasEl = canvasWrapper.querySelector('.lower-canvas');
             if (!fabricCanvasEl) return null;
-            
-            // Extract fabric structure directly using instance identifier mappings
             return fabric.instances && Object.values(fabric.instances).find(inst => inst.lowerCanvasEl === fabricCanvasEl);
         }
 
-        // Trigger dynamic color dynamic parameter updates to brushes properties
         function updateBrushProperties() {
             setEditMode(appState.editMode);
         }
 
-        // Action: Draw structural bounding shape overlays onto dynamic Canvas Layout planes
         function addRectangle() {
             const fCanvas = getActiveFabricInstance();
             if (!fCanvas) return;
@@ -1112,27 +977,54 @@
                 height: 100,
                 cornerColor: '#06b6d4'
             });
-
             fCanvas.add(rect);
             fCanvas.setActiveObject(rect);
             setEditMode('select');
         }
 
-        // Action Zoom manipulation routine methods
+        // 🖼 INTERACTIVE IMAGE INSERTION TRIGGER MECHANISM
+        function triggerImageUpload() {
+            document.getElementById('image-loader-input').click();
+        }
+
+        function insertImageOnCanvas(event) {
+            const fCanvas = getActiveFabricInstance();
+            if (!fCanvas) return;
+
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(f) {
+                const data = f.target.result;
+                fabric.Image.fromURL(data, function(img) {
+                    img.scaleToWidth(200); // Scale down image file cleanly
+                    img.set({
+                        left: fCanvas.width / 2 - 100,
+                        top: fCanvas.height / 2 - 100,
+                        borderColor: '#06b6d4',
+                        cornerColor: '#06b6d4'
+                    });
+                    fCanvas.add(img);
+                    fCanvas.setActiveObject(img);
+                    fCanvas.renderAll();
+                    showToast("New image placed successfully", "success");
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
         function zoomCanvas(factor) {
             appState.zoomLevel = Math.max(0.5, Math.min(2.5, appState.zoomLevel * factor));
             changeActivePage(currentPageNum);
             showToast(`Zoom: ${Math.round(appState.zoomLevel * 100)}%`, "info");
         }
 
-        // Clear dynamic elements on the active Fabric layout layer
         function clearCurrentCanvas() {
             const fCanvas = getActiveFabricInstance();
             if (fCanvas) {
                 fCanvas.clear();
-                // Ensure layout restoration framework image maps persist
                 const cleanCanvas = document.getElementById('active-pdf-canvas');
-                const cleanContext = cleanCanvas.getContext('2d');
                 const backingImg = cleanCanvas.toDataURL("image/png");
                 fabric.Image.fromURL(backingImg, function(img) {
                     fCanvas.setBackgroundImage(img, fCanvas.renderAll.bind(fCanvas));
@@ -1141,7 +1033,6 @@
             }
         }
 
-        // Dynamic Document Rotation Logic (90-degree steps)
         async function rotateActivePage() {
             if (!appState.pdfLibDoc) return;
             try {
@@ -1150,7 +1041,6 @@
                 const nextRotation = (currentRotation + 90) % 360;
                 page.setRotation(PDFLib.degrees(nextRotation));
                 
-                // Export modified layout to local array buffer
                 const pdfBytes = await appState.pdfLibDoc.save();
                 appState.pdfBytes = pdfBytes.buffer;
 
@@ -1159,13 +1049,12 @@
                 
                 await buildEditorThumbnails();
                 await changeActivePage(currentPageNum);
-                showToast(`Page ${currentPageNum} rotated directly to ${nextRotation}°`, "success");
+                showToast(`Page rotated to ${nextRotation}°`, "success");
             } catch (err) {
                 showToast("Error executing page rotation: " + err.message, "error");
             }
         }
 
-        // Discard page from document context
         async function deleteActivePage() {
             if (!appState.pdfLibDoc || appState.totalPages <= 1) {
                 showToast("Cannot delete pages on solitary file templates", "error");
@@ -1177,7 +1066,6 @@
                     appState.pdfLibDoc.removePage(currentPageNum - 1);
                     appState.totalPages -= 1;
                     
-                    // Reset internal structured layout indices maps directly on delete mutations
                     const updatedInstances = {};
                     Object.keys(appState.canvasInstances).forEach(key => {
                         const parsedKey = parseInt(key);
@@ -1194,28 +1082,22 @@
 
                     const typedArray = new Uint8Array(pdfBytes.buffer);
                     appState.pdfDoc = await pdfjsLib.getDocument({ data: typedArray }).promise;
-
-                    // Relocate pagination structures safely
                     currentPageNum = Math.max(1, currentPageNum - 1);
 
                     await buildEditorThumbnails();
                     await changeActivePage(currentPageNum);
-                    showToast("Deleted structural page context", "success");
+                    showToast("Page deleted successfully", "success");
                 } catch (err) {
-                    showToast("Error processing structural layout update: " + err.message, "error");
+                    showToast("Error processing deletion: " + err.message, "error");
                 }
             }
         }
 
-        // Dynamic Canvas overlay image exporter execution loop logic
         async function compileAndExportPDF() {
             if (!appState.pdfBytes || !appState.pdfLibDoc) return;
-
-            showToast("Executing Document Packaging Compiler...", "info");
+            showToast("Exporting modified PDF file...", "info");
             
             try {
-                // Read local application models to apply changes to target memory structure
-                const fInstances = fabric.instances;
                 const keys = Object.keys(appState.canvasInstances);
 
                 for (let key of keys) {
@@ -1223,10 +1105,9 @@
                     const jsonState = appState.canvasInstances[key];
                     
                     if (jsonState) {
-                        // Create a temporary off-screen Canvas to render vectors without UI artifacts
                         const tempCanvas = document.createElement('canvas');
                         const page = await appState.pdfDoc.getPage(pageIndex + 1);
-                        const viewport = page.getViewport({ scale: 2.0 }); // High-definition export
+                        const viewport = page.getViewport({ scale: 2.0 }); 
                         tempCanvas.width = viewport.width;
                         tempCanvas.height = viewport.height;
 
@@ -1235,7 +1116,6 @@
                             height: viewport.height
                         });
 
-                        // Synchronously await JSON state loading
                         await new Promise((resolve) => {
                             fTempCanvas.loadFromJSON(jsonState, () => {
                                 fTempCanvas.renderAll();
@@ -1243,24 +1123,17 @@
                             });
                         });
 
-                        // Output high precision overlay with absolute transparent channel background layers
                         fTempCanvas.setBackgroundImage(null, fTempCanvas.renderAll.bind(fTempCanvas));
                         
                         const items = fTempCanvas.getObjects();
                         if (items.length > 0) {
-                            const overlayDataUrl = fTempCanvas.toDataURL({
-                                format: 'png',
-                                quality: 1.0
-                            });
-
-                            // Embed the PNG overlay back onto the corresponding PDF-Lib page layout
+                            const overlayDataUrl = fTempCanvas.toDataURL({ format: 'png', quality: 1.0 });
                             const overlayImageBytes = await fetch(overlayDataUrl).then(res => res.arrayBuffer());
                             const embeddedImage = await appState.pdfLibDoc.embedPng(overlayImageBytes);
 
                             const pdfLibPage = appState.pdfLibDoc.getPage(pageIndex);
                             const { width, height } = pdfLibPage.getSize();
 
-                            // Maintain aspect ratio dimensions dynamically on merge rendering actions
                             pdfLibPage.drawImage(embeddedImage, {
                                 x: 0,
                                 y: 0,
@@ -1269,23 +1142,18 @@
                                 opacity: 1.0
                             });
                         }
-                        
                         fTempCanvas.dispose();
                     }
                 }
 
-                // Compress file structures into clean Uint8Array byte output streams
                 const finalPdfBytes = await appState.pdfLibDoc.save();
                 const blob = new Blob([finalPdfBytes], { type: "application/pdf" });
-                
-                // Trigger download directly inside client framework using FileSaver
                 const outName = appState.currentFileMetadata.name.replace(".pdf", "_edited_rasel.pdf");
                 saveAs(blob, outName);
-                showToast("Document package exported successfully", "success");
-
+                showToast("Document saved!", "success");
             } catch (err) {
                 console.error(err);
-                showToast("Export process aborted: " + err.message, "error");
+                showToast("Export aborted: " + err.message, "error");
             }
         }
 
@@ -1294,16 +1162,11 @@
         // ELECTRONIC SIGNATURE PAD SYSTEM HANDLERS
         // ==========================================
 
-        let sigPadInstance = {
-            canvas: null,
-            ctx: null,
-            drawing: false
-        };
+        let sigPadInstance = { canvas: null, ctx: null, drawing: false };
 
         function initSignaturePad() {
             sigPadInstance.canvas = document.getElementById('signature-pad');
             sigPadInstance.ctx = sigPadInstance.canvas.getContext('2d');
-            
             const canvas = sigPadInstance.canvas;
             const ctx = sigPadInstance.ctx;
 
@@ -1311,20 +1174,17 @@
             ctx.lineWidth = 3;
             ctx.lineCap = "round";
 
-            // Drawing event mechanics
             canvas.addEventListener('mousedown', (e) => {
                 sigPadInstance.drawing = true;
                 ctx.beginPath();
                 ctx.moveTo(e.offsetX, e.offsetY);
             });
-
             canvas.addEventListener('mousemove', (e) => {
                 if (sigPadInstance.drawing) {
                     ctx.lineTo(e.offsetX, e.offsetY);
                     ctx.stroke();
                 }
             });
-
             canvas.addEventListener('mouseup', () => sigPadInstance.drawing = false);
             canvas.addEventListener('mouseleave', () => sigPadInstance.drawing = false);
         }
@@ -1345,8 +1205,6 @@
 
         function applySignature() {
             const canvas = sigPadInstance.canvas;
-            
-            // Check signature transparency layers bounds
             const dataUrl = canvas.toDataURL("image/png");
             const fCanvas = getActiveFabricInstance();
             
@@ -1363,7 +1221,7 @@
                     fCanvas.add(img);
                     fCanvas.setActiveObject(img);
                     fCanvas.renderAll();
-                    showToast("Signature overlay placed into Workspace", "success");
+                    showToast("Signature placed on Page", "success");
                 });
             }
             closeSignatureModal();
@@ -1385,8 +1243,6 @@
                 reader.onload = async function() {
                     try {
                         const arrayBuffer = this.result;
-                        
-                        // 🛠 Uint8Array Safe load for stability
                         const typedArray = new Uint8Array(arrayBuffer);
                         appState.pdfDoc = await pdfjsLib.getDocument({ data: typedArray }).promise;
                         appState.totalPages = appState.pdfDoc.numPages;
@@ -1399,24 +1255,22 @@
                         setTimeout(() => {
                             loader.classList.add('hidden');
                             document.getElementById('converter-workspace').classList.remove('hidden');
-                            showToast("Renderer workspace matrices parsed successfully", "success");
+                            showToast("PDF analyzed for Conversion Workspace", "success");
                         }, 400);
-                    } catch (parseError) {
-                        console.error(parseError);
-                        showToast("Failed to process file template structure: " + parseError.message, "error");
+                    } catch (err) {
+                        showToast("Error processing PDF conversion file: " + err.message, "error");
                         document.getElementById('drop-zone-converter').classList.remove('hidden');
                         document.getElementById('converter-loader').classList.add('hidden');
                     }
                 };
                 reader.readAsArrayBuffer(file);
             } catch (err) {
-                showToast("Parsing converter structures failed: " + err.message, "error");
+                showToast("Parsing failed: " + err.message, "error");
                 document.getElementById('drop-zone-converter').classList.remove('hidden');
                 document.getElementById('converter-loader').classList.add('hidden');
             }
         }
 
-        // Render document overview grid mapping inside conversion dashboard panel
         async function buildConverterPageGrid() {
             const grid = document.getElementById('converter-grid');
             grid.innerHTML = '';
@@ -1428,7 +1282,6 @@
                 card.className = "glass-card p-3 rounded-xl border border-white/5 flex flex-col gap-3 cursor-pointer relative group transition duration-300 hover:border-pink-500/50";
                 card.onclick = () => togglePageForExport(i);
 
-                // Selector indicator bubble tag overlay elements
                 const selectBubble = document.createElement('div');
                 selectBubble.id = `conv-bubble-${i}`;
                 selectBubble.className = "absolute top-4 right-4 w-6 h-6 rounded-full bg-slate-900/80 border border-white/20 flex items-center justify-center text-xs text-white transition";
@@ -1443,24 +1296,19 @@
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
 
-                const renderContext = {
-                    canvasContext: canvas.getContext('2d'),
-                    viewport: viewport
-                };
+                const renderContext = { canvasContext: canvas.getContext('2d'), viewport: viewport };
                 await page.render(renderContext).promise;
 
                 card.appendChild(canvas);
-
                 const label = document.createElement('div');
                 label.className = "flex justify-between items-center text-xs font-semibold text-slate-400";
-                label.innerHTML = `<span>Page ${i}</span> <span class="text-[10px] text-slate-500">${viewport.width * 2}x${viewport.height * 2} px</span>`;
+                label.innerHTML = `<span>Page ${i}</span>`;
                 card.appendChild(label);
 
                 grid.appendChild(card);
             }
         }
 
-        // Handle page selection toggle mechanics
         function togglePageForExport(pageNum) {
             const index = appState.selectedExportPages.indexOf(pageNum);
             const bubble = document.getElementById(`conv-bubble-${pageNum}`);
@@ -1479,7 +1327,6 @@
             }
         }
 
-        // Change range target extraction configuration properties options
         function setExportRange(mode) {
             appState.exportRangeMode = mode;
             document.getElementById('btn-range-all').className = "text-slate-400 hover:text-white text-xs px-3 py-1.5 rounded-md font-semibold transition";
@@ -1492,7 +1339,6 @@
             }
         }
 
-        // Trigger compilation and execution steps for high fidelity PDF-to-PNG generation
         async function executePNGExport() {
             let targets = [];
             if (appState.exportRangeMode === 'all') {
@@ -1502,11 +1348,11 @@
             }
 
             if (targets.length === 0) {
-                showToast("Please choose target compilation screens first", "error");
+                showToast("Please choose target pages", "error");
                 return;
             }
 
-            showToast(`Generating image archives for ${targets.length} pages...`, "info");
+            showToast(`Processing ${targets.length} images...`, "info");
             
             document.getElementById('converter-workspace').classList.add('hidden');
             const loader = document.getElementById('converter-loader');
@@ -1518,8 +1364,6 @@
             try {
                 for (let idx = 0; idx < targets.length; idx++) {
                     const pageNum = targets[idx];
-                    
-                    // Display loading updates programmatically
                     const progressPercent = Math.round(((idx + 1) / targets.length) * 100);
                     document.getElementById('converter-progress-bar').style.width = `${progressPercent}%`;
 
@@ -1531,24 +1375,18 @@
                     tempCanvas.height = viewport.height;
                     const ctx = tempCanvas.getContext('2d');
 
-                    const renderContext = {
-                        canvasContext: ctx,
-                        viewport: viewport
-                    };
+                    const renderContext = { canvasContext: ctx, viewport: viewport };
                     await page.render(renderContext).promise;
 
-                    // Output clean high precision raster blobs
                     const blob = await new Promise((resolve) => tempCanvas.toBlob(resolve, 'image/png'));
                     zip.file(`page-${pageNum}.png`, blob);
                 }
 
-                // Compress output ZIP stream and trigger down file packaging mechanics
                 const content = await zip.generateAsync({ type: "blob" });
-                saveAs(content, "MD_RASEL_PNG_PACK_STUDIO.zip");
-                
-                showToast("Image matrix archive compilation completed", "success");
+                saveAs(content, "MD_RASEL_PNG_PACK.zip");
+                showToast("Images converted and zipped!", "success");
             } catch (err) {
-                showToast("Compilation engine execution failed: " + err.message, "error");
+                showToast("Conversion failed: " + err.message, "error");
             } finally {
                 loader.classList.add('hidden');
                 document.getElementById('converter-workspace').classList.remove('hidden');
@@ -1562,11 +1400,8 @@
 
         function saveRecentFileRecord(name, size) {
             let files = JSON.parse(localStorage.getItem('rasel_studio_recent_files') || '[]');
-            // Filter duplicates from the array
             files = files.filter(f => f.name !== name);
             files.unshift({ name, size, date: new Date().toLocaleDateString() });
-            
-            // Slice structural storage limit bounds
             if (files.length > 5) files.pop();
             localStorage.setItem('rasel_studio_recent_files', JSON.stringify(files));
             populateRecentFiles();
@@ -1575,12 +1410,10 @@
         function populateRecentFiles() {
             const list = document.getElementById('recent-files-list');
             const files = JSON.parse(localStorage.getItem('rasel_studio_recent_files') || '[]');
-            
             if (files.length === 0) {
-                list.innerHTML = `<div class="text-[11px] text-slate-500 italic p-2 text-center">No recent files in cache.</div>`;
+                list.innerHTML = `<div class="text-[11px] text-slate-500 italic p-2 text-center">No recent files.</div>`;
                 return;
             }
-
             list.innerHTML = '';
             files.forEach(f => {
                 const item = document.createElement('div');
@@ -1594,42 +1427,31 @@
         }
 
         function clearCache() {
-            if (confirm("Reset workspace cache environment states?")) {
+            if (confirm("Reset workspace cache?")) {
                 localStorage.removeItem('rasel_studio_recent_files');
                 appState.canvasInstances = {};
                 populateRecentFiles();
-                showToast("Workspace configuration successfully purged", "success");
+                showToast("Workspace configuration successfully reset", "success");
             }
         }
 
-        // Toggle global Theme styles
         function toggleTheme() {
             const html = document.documentElement;
             const indicator = document.getElementById('theme-indicator');
             if (html.classList.contains('dark')) {
                 html.classList.remove('dark');
-                indicator.innerHTML = `<i class="fa-solid fa-sun text-amber-500 text-sm animate-spin"></i>`;
-                showToast("Light mode activated temporarily", "info");
+                indicator.innerHTML = `<i class="fa-solid fa-sun text-amber-500 text-sm"></i>`;
+                showToast("Light mode activated", "info");
             } else {
                 html.classList.add('dark');
                 indicator.innerHTML = `<i class="fa-solid fa-moon text-cyan-400 text-sm"></i>`;
-                showToast("Futuristic Dark mode activated", "success");
+                showToast("Dark mode activated", "success");
             }
         }
 
-        // Modal triggers
-        function openKeyboardShortcuts() {
-            document.getElementById('shortcuts-modal').classList.remove('hidden');
-        }
-
-        function closeKeyboardShortcuts() {
-            document.getElementById('shortcuts-modal').classList.add('hidden');
-        }
-
-        function toggleSidebarMobile() {
-            const sidebar = document.querySelector('aside');
-            sidebar.classList.toggle('hidden');
-        }
+        function openKeyboardShortcuts() { document.getElementById('shortcuts-modal').classList.remove('hidden'); }
+        function closeKeyboardShortcuts() { document.getElementById('shortcuts-modal').classList.add('hidden'); }
+        function toggleSidebarMobile() { document.querySelector('aside').classList.toggle('hidden'); }
     </script>
 </body>
 </html>
