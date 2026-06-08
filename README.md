@@ -1,54 +1,88 @@
 # 🚀 MD RASEL PDF STUDIO
 
-**MD RASEL PDF STUDIO** is an advanced, client-side web application for managing and editing PDF documents. Powered by a futuristic, high-performance dark-mode UI with smooth animations, neon accents, and glassmorphism styling, this tool operates **100% inside your browser**. Your documents never touch a web server—ensuring maximum privacy and zero latency.
+**MD RASEL PDF STUDIO** is an advanced, fully responsive, and serverless client-side PDF editing and conversion suite. Powered by cutting-edge web technologies, this tool operates **100% inside your web browser**. Your documents are never uploaded to any remote server, guaranteeing absolute privacy and zero latency.
 
 ---
 
-## ✨ Features Highlight
+## 🌍 Open Live Website
 
-### 1. 📁 PDF Upload System
-- **Drag & Drop Workspace:** Drop a file anywhere on the interface to initialize.
-- **Dynamic Diagnostics:** Real-time size calculation and page preview generation.
-- **Zero Server Uploads:** Reads local files directly into browser-allocated variables.
+Click the button below to open the application directly in your browser:
 
-### 2. 📝 PDF Interactive Editing Suite
-- **Vector Overlays:** Add, rotate, scale, and manipulate shapes directly.
-- **Text Layer Editing:** Inject customizable text nodes using a canvas overlay powered by Fabric.js.
-- **Draw & Highlight Tools:** Freehand brush with opacity controls for real-time document highlighting.
-- **Electronic Signatures:** Integrated modal brush pad to sign documents cleanly.
-- **Page Management:** Reorder, rotate, or delete individual pages directly on the fly.
+<p align="center">
+  <a href="https://hanter-xd-official.github.io/PDF-EDIT/" target="_blank">
+    <img src="https://img.shields.io/badge/🌍_Open_Website-MD_RASEL_PDF_STUDIO-06b6d4?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Open Website" />
+  </a>
+</p>
 
-### 3. 🖼️ PDF to PNG Converter
-- **HD Matrix Rasterizer:** Output structural elements as high-resolution PNGs.
-- **Range Control:** Convert entire documents or specify a subset of pages.
-- **Automated Packaging:** Instantly packages all rendered PNGs into a zipped archive (.zip).
-
-### 4. 💎 Premium Extra Addons
-- **Dynamic Localization Hook:** Supports Multi-Language selection dynamically.
-- **Workspace Cache:** Stores recent files in LocalStorage to fast-track active workflows.
-- **System Shortcuts:** Quick-access keystroke options to facilitate rapid vector workspace editing.
+<p align="center">
+  <strong>🔗 Live URL:</strong> <a href="https://hanter-xd-official.github.io/PDF-EDIT/">https://hanter-xd-official.github.io/PDF-EDIT/</a>
+</p>
 
 ---
 
-## 🛠️ Technology Stack & Libraries
-
-To build this fully client-side suite, **MD RASEL PDF STUDIO** leverages the following frontend components:
-- [Tailwind CSS (via CDN)](https://tailwindcss.com/) - Responsive utility layout design.
-- [pdf.js (by Mozilla)](https://github.com/mozilla/pdf.js) - Accurate document parsing and dynamic canvas generation.
-- [pdf-lib](https://pdf-lib.js.org/) - Document layout restructuring, deletion, rotation, and high-fidelity image compression.
-- [fabric.js](http://fabricjs.com/) - Vector element orchestration, text manipulators, and freehand brushes.
-- [JSZip](https://stuk.github.io/jszip/) - In-memory compression engine for PNG bundles.
-- [FileSaver.js](https://github.com/eligrey/FileSaver.js/) - Seamless browser-level download prompts.
+## 📋 Table of Contents
+- [Core Features](#-core-features)
+- [Technical Architecture](#-technical-architecture)
+- [Keyboard Shortcuts](#-keyboard-shortcuts)
+- [Local Setup & Deployment](#-local-setup--deployment)
+- [Privacy & Security](#-privacy--security)
+- [Developer & Credits](#-developer--credits)
 
 ---
 
-## 🚀 Deployment Instructions for GitHub Pages
+## ✨ Core Features
 
-Deploying your project is incredibly simple and requires no backend setup:
+### 1. Interactive PDF Editor
+* **True PDF Text Editing:** The engine automatically parses text layout nodes upon file import, positioning editable Fabric.js elements on top. Simply double-click any text block to modify, replace, resize, or move it.
+* **Double-Text Overlap Prevention (Full HD Flattening):** Rather than layering transparent edits over original vector text (which causes duplicate overlapping text on export), the rendering engine compiles all modified layers into a single clean, flat document layer.
+* **Image Insertion & Replacement:** Upload photos, logos, or annotations to scale, rotate, and overlay anywhere on the PDF pages.
+* **Whiteout / Erase Tool:** A dedicated solid white brush tool to easily mask out or whiteout unwanted text, elements, or watermarks.
+* **Digital Signatures:** Hand-draw and save electronic signatures directly inside an integrated touch-responsive sketch pad modal.
+* **Page Structuring:** Rotate pages 90° clockwise or delete pages permanently from the document array with instant index reconstruction.
+* **Pinch-to-Zoom & Pan:** A mobile-friendly canvas viewport allowing touch-scrolling and horizontal/vertical panning on smaller screens.
 
-### Step 1: Initialize Git Repo Local Folder
-Create a clean directory on your local machine and place the `index.html` inside it:
-```bash
-mkdir md-rasel-pdf-studio
-cd md-rasel-pdf-studio
-# Copy your index.html and this README.md inside this folder.
+### 2. PDF to PNG Rasterizer Converter
+* **Full HD Rendering:** Convert PDF pages into high-density rasterized PNG images with selectable scales ranging from standard (1.0x) to Ultra HD (3.0x).
+* **Page Range Selection:** Choose to export all pages or convert selected pages only.
+* **Automated ZIP Packager:** Converts and packages all rendered image files into a compressed `.zip` archive on the fly inside the browser.
+
+### 3. Futuristic UI/UX
+* **Glassmorphism Dashboard:** Immersive dark mode styling accented with neon-glow transitions and floating background particle effects.
+* **Mobile Layout Optimization:** The sidebar auto-hides on mobile viewports to save screen space, accompanied by a dedicated **Immersive Full Screen** toggle.
+* **Animated Splash Screen:** A premium onboarding screen transition that handles safe worker loading on startup.
+* **Recent Files Cache:** Keeps track of your last 5 processed files locally in `localStorage` for rapid workflow resumption.
+
+---
+
+## 🛠️ Technical Architecture
+
+This application operates completely on the client side without relying on database servers:
+* **PDF.js Engine (v2.16.105):** Standard library utilized to parse and render vector PDF frames directly onto HTML5 canvases.
+* **Blob-Worker CORS Bypass:** To bypass origin blocking policies on platforms like GitHub Pages, the PDF.js Web Worker is initialized dynamically using an inline Base64 blob wrapper.
+* **Fabric.js (v5.3.1):** Manages interactive overlay vector elements, freehand brush parameters, shapes, and signature scaling.
+* **PDF-Lib:** Used to compile structural alterations, add pages, and render flattened high-resolution canvas snapshots back into standard PDF binaries.
+* **Dual-Layer Safe Downloader:** To handle download blocking policies on some mobile webviews and mobile Chrome browsers, the download pipeline features an automated HTML5 Anchor link-generation fallback mechanism.
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+Speed up your editing workflow using these integrated keyboard triggers:
+
+| Key | Action |
+| --- | --- |
+| **`V`** | Activates Selection/Editing Mode |
+| **`T`** | Adds a New Text Layer to the Canvas |
+| **`Delete` / `Backspace`** | Removes the Selected Element or Image Object |
+| **`Ctrl` + Mouse Wheel** | Zooms the Active Canvas In and Out |
+
+---
+
+## 💻 Local Setup & Deployment
+
+To run this project locally or host it yourself, follow these instructions:
+
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/PDF-EDIT.git
+   cd PDF-EDIT
