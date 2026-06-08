@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Frontend Client-Side Libraries (Using Ultra-Stable PDF.js 2.16.105) -->
+    <!-- Frontend Client-Side Libraries -->
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
@@ -146,8 +146,8 @@
     <!-- MAIN DASHBOARD CONTENT GRID -->
     <div class="flex-1 flex flex-col md:flex-row z-10 min-h-screen">
         
-        <!-- SIDEBAR NAVIGATION PANEL -->
-        <aside class="w-full md:w-80 glass-panel border-r border-white/10 flex flex-col shrink-0">
+        <!-- SIDEBAR NAVIGATION PANEL (Responsive Layout Optimised) -->
+        <aside id="sidebar-panel" class="hidden md:flex w-full md:w-80 glass-panel border-r border-white/10 flex-col shrink-0 fixed md:relative z-40 h-screen md:h-auto">
             <!-- Branding Header -->
             <div class="p-6 border-b border-white/10 flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -159,8 +159,13 @@
                         <span class="text-[10px] text-cyan-400 font-semibold tracking-wider uppercase">PDF Studio Pro</span>
                     </div>
                 </div>
-                <div id="theme-indicator" class="w-8 h-8 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center cursor-pointer hover:border-cyan-400 transition" onclick="toggleTheme()">
-                    <i class="fa-solid fa-moon text-cyan-400 text-sm"></i>
+                <div class="flex items-center gap-2">
+                    <div id="theme-indicator" class="w-8 h-8 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center cursor-pointer hover:border-cyan-400 transition" onclick="toggleTheme()">
+                        <i class="fa-solid fa-moon text-cyan-400 text-sm"></i>
+                    </div>
+                    <button class="md:hidden text-white text-lg p-1" onclick="toggleSidebarMobile()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
             </div>
 
@@ -225,17 +230,17 @@
         </aside>
 
         <!-- MAIN INTERACTIVE VIEWPORT CONTAINER -->
-        <main class="flex-1 flex flex-col overflow-y-auto relative z-10">
+        <main id="main-content" class="flex-1 flex flex-col overflow-y-auto relative z-10 transition-all duration-300">
             
             <!-- SYSTEM MAIN TOP NAVBAR -->
-            <header class="h-20 border-b border-white/10 glass-panel flex items-center justify-between px-8 shrink-0">
+            <header id="main-header" class="h-20 border-b border-white/10 glass-panel flex items-center justify-between px-6 shrink-0">
                 <div class="flex items-center gap-4">
-                    <button class="md:hidden text-white text-xl" onclick="toggleSidebarMobile()">
+                    <button class="text-white text-xl p-2 bg-slate-900/60 rounded-lg border border-white/10" onclick="toggleSidebarMobile()">
                         <i class="fa-solid fa-bars"></i>
                     </button>
                     <div>
-                        <h1 id="view-title" class="text-xl font-display font-bold text-white tracking-wide">Studio Dashboard</h1>
-                        <p id="view-subtitle" class="text-xs text-slate-400">Central workspace management & analytics overview</p>
+                        <h1 id="view-title" class="text-lg md:text-xl font-display font-bold text-white tracking-wide">Studio Dashboard</h1>
+                        <p id="view-subtitle" class="text-xs text-slate-400 hidden sm:block">Central workspace management & analytics overview</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
@@ -251,7 +256,7 @@
             </header>
 
             <!-- DYNAMIC SCREEN CHANNELS -->
-            <div class="flex-1 p-8 overflow-y-auto relative">
+            <div class="flex-1 p-4 md:p-8 overflow-y-auto relative">
 
                 <!-- SCREEN 1: STUDIO DASHBOARD -->
                 <section id="dashboard-tab" class="tab-screen space-y-8">
@@ -338,27 +343,27 @@
                         <!-- Floating Intelligent Controls Ribbon -->
                         <div class="glass-panel p-4 rounded-xl flex flex-wrap items-center justify-between gap-4 border border-white/10 sticky top-0 z-30">
                             <div class="flex flex-wrap items-center gap-2">
-                                <button onclick="setEditMode('select')" id="tool-select" class="tool-btn bg-cyan-500 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                <button onclick="setEditMode('select')" id="tool-select" class="tool-btn bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
                                     <i class="fa-solid fa-arrow-pointer"></i> Select/Edit
                                 </button>
-                                <button onclick="setEditMode('text')" id="tool-text" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                <button onclick="setEditMode('text')" id="tool-text" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
                                     <i class="fa-solid fa-font"></i> Add Text
                                 </button>
-                                <button onclick="triggerImageUpload()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                <button onclick="triggerImageUpload()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
                                     <i class="fa-solid fa-image"></i> Insert Image
                                 </button>
                                 <input type="file" id="image-loader-input" accept="image/*" class="hidden" onchange="insertImageOnCanvas(event)">
                                 
-                                <button onclick="setEditMode('draw')" id="tool-draw" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                <button onclick="setEditMode('draw')" id="tool-draw" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
                                     <i class="fa-solid fa-pen"></i> Brush
                                 </button>
-                                <button onclick="setEditMode('highlight')" id="tool-highlight" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                <button onclick="setEditMode('highlight')" id="tool-highlight" class="tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
                                     <i class="fa-solid fa-highlighter text-amber-400"></i> Highlight
                                 </button>
-                                <button onclick="addRectangle()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                <button onclick="addRectangle()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
                                     <i class="fa-regular fa-square"></i> Shape
                                 </button>
-                                <button onclick="triggerSignatureModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                                <button onclick="triggerSignatureModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
                                     <i class="fa-solid fa-signature text-purple-400"></i> Signature
                                 </button>
                             </div>
@@ -375,6 +380,10 @@
                             </div>
 
                             <div class="flex items-center gap-2 border-l border-white/10 pl-4">
+                                <!-- Immersive Full Screen Toggle Mode Button -->
+                                <button id="fullscreen-btn" onclick="toggleFullscreenMode()" class="bg-slate-800 hover:bg-slate-700 border border-white/10 text-cyan-400 px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5" title="Toggle Immersive Full Screen View">
+                                    <i class="fa-solid fa-expand"></i> Full Screen
+                                </button>
                                 <button onclick="rotateActivePage()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg text-xs" title="Rotate Page 90°">
                                     <i class="fa-solid fa-rotate-right"></i>
                                 </button>
@@ -403,13 +412,13 @@
                         <!-- Core Editor View -->
                         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
                             <!-- Left: Interactive Structural Thumbnails -->
-                            <div class="glass-panel p-4 rounded-xl border border-white/10 flex flex-col gap-4 max-h-[70vh] overflow-y-auto lg:col-span-1">
+                            <div id="thumbnails-panel-parent" class="glass-panel p-4 rounded-xl border border-white/10 flex flex-col gap-4 max-h-[50vh] lg:max-h-[70vh] overflow-y-auto lg:col-span-1">
                                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Page Structure Layout</h4>
                                 <div id="thumbnails-container" class="space-y-4"></div>
                             </div>
 
                             <!-- Right: The Sandbox Layer Overlay Viewer -->
-                            <div class="lg:col-span-3 flex flex-col items-center">
+                            <div class="lg:col-span-3 flex flex-col items-center w-full">
                                 <div class="w-full flex items-center justify-between mb-4">
                                     <span class="text-xs text-slate-400">Editing Page: <strong id="active-page-number" class="text-cyan-400">1</strong> of <span id="total-pages-number">1</span></span>
                                     <div class="flex items-center gap-2">
@@ -418,9 +427,9 @@
                                     </div>
                                 </div>
 
-                                <!-- The Fabric.js Sandbox Wrapper viewport container -->
-                                <div id="workspace-canvas-wrapper" class="relative bg-slate-900 border border-white/15 rounded-xl overflow-hidden flex items-center justify-center p-6 shadow-2xl">
-                                    <canvas id="active-pdf-canvas" class="shadow-lg"></canvas>
+                                <!-- Immersive Panning Box Wrapper optimised for Touch Devices -->
+                                <div id="workspace-canvas-wrapper" class="relative bg-slate-900 border border-white/15 rounded-xl overflow-auto max-w-full w-full flex items-center justify-start md:justify-center p-2 md:p-6 shadow-2xl" style="touch-action: pan-x pan-y;">
+                                    <canvas id="active-pdf-canvas" class="shadow-lg mx-auto"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -509,8 +518,8 @@
 
             </div>
 
-            <!-- SYSTEM FOOTER (BRANDING FOOTER) -->
-            <footer class="h-16 border-t border-white/5 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-between px-8 text-xs text-slate-500 shrink-0">
+            <!-- SYSTEM FOOTER -->
+            <footer id="main-footer" class="h-16 border-t border-white/5 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-between px-8 text-xs text-slate-500 shrink-0">
                 <div>
                     <span>© 2026 MD RASEL. All rights reserved.</span>
                 </div>
@@ -599,6 +608,7 @@
         };
 
         let currentPageNum = 1;
+        let isFullscreen = false; // Immersive Mode Status Tracker
 
         // Initialize Background Particle Floating Animations & Setup CORS Bypass on Load
         window.addEventListener('DOMContentLoaded', async () => {
@@ -615,13 +625,12 @@
                 container.appendChild(particle);
             }
 
-            // 🛠 CORS BYPASS INLINE WORKER FOR MOBILES: Spawns the PDF.js Web Worker using an inline base Blob URL
+            // CORS BYPASS INLINE WORKER FOR MOBILES
             try {
                 const workerScript = `importScripts("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js");`;
                 const blob = new Blob([workerScript], { type: 'application/javascript' });
                 const workerBlobUrl = URL.createObjectURL(blob);
                 pdfjsLib.GlobalWorkerOptions.workerSrc = workerBlobUrl;
-                console.log("Internal Blob-Worker initialized cleanly.");
             } catch (err) {
                 console.warn("Blob Worker fallback trigger.", err);
                 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -644,6 +653,45 @@
             populateRecentFiles();
             initSignaturePad();
         });
+
+        // 🛠 NEW CRITICAL FUNCTION: Immersive Fullscreen Workspace Mode Toggle Engine
+        function toggleFullscreenMode() {
+            const sidebar = document.getElementById('sidebar-panel');
+            const header = document.getElementById('main-header');
+            const footer = document.getElementById('main-footer');
+            const mainContent = document.getElementById('main-content');
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            const thumbPanel = document.getElementById('thumbnails-panel-parent');
+
+            isFullscreen = !isFullscreen;
+
+            if (isFullscreen) {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('md:flex');
+                header.classList.add('hidden');
+                footer.classList.add('hidden');
+                thumbPanel.classList.add('hidden'); // Minimize thumbnail track on small mobile screens
+                fullscreenBtn.innerHTML = `<i class="fa-solid fa-compress"></i> Exit Full Screen`;
+                fullscreenBtn.classList.remove('text-cyan-400');
+                fullscreenBtn.classList.add('bg-red-500/20', 'text-red-400', 'border-red-500/30');
+                showToast("Immersive Fullscreen Mode Activated", "success");
+            } else {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('md:flex');
+                header.classList.remove('hidden');
+                footer.classList.remove('hidden');
+                thumbPanel.classList.remove('hidden');
+                fullscreenBtn.innerHTML = `<i class="fa-solid fa-expand"></i> Full Screen`;
+                fullscreenBtn.classList.add('text-cyan-400');
+                fullscreenBtn.classList.remove('bg-red-500/20', 'text-red-400', 'border-red-500/30');
+                showToast("Returned to Standard Layout", "info");
+            }
+
+            // Trigger workspace canvas scale update loops to adapt dimensions immediately
+            if (appState.pdfDoc) {
+                changeActivePage(currentPageNum);
+            }
+        }
 
         function changeLanguage() {
             const lang = document.getElementById('lang-select').value;
@@ -742,7 +790,6 @@
 
                         document.getElementById('editor-progress-bar').style.width = '60%';
                         
-                        // 🛠 Mobile Stable parsing with typed arrays
                         const typedArray = new Uint8Array(arrayBuffer);
                         appState.pdfDoc = await pdfjsLib.getDocument({ data: typedArray }).promise;
                         appState.pdfLibDoc = await PDFLib.PDFDocument.load(arrayBuffer);
@@ -834,11 +881,9 @@
             const renderContext = { canvasContext: ctx, viewport: viewport };
             await page.render(renderContext).promise;
 
-            // Render interactive fabric overlay and auto-extract text
             await initFabricLayerAndParseText(activeCanvas, page, viewport);
         }
 
-        // 🛠 NEW CRITICAL FUNCTION: RENDERS PDF BACKGROUND, GENERATES COVER LAYERS & EXTRACTS EDITABLE TEXT
         async function initFabricLayerAndParseText(targetCanvas, pdfPage, viewport) {
             const wrapper = document.getElementById('workspace-canvas-wrapper');
             const existingContainer = wrapper.querySelector('.canvas-container');
@@ -847,7 +892,7 @@
                 existingContainer.remove();
                 const cleanCanvas = document.createElement('canvas');
                 cleanCanvas.id = 'active-pdf-canvas';
-                cleanCanvas.className = "shadow-lg";
+                cleanCanvas.className = "shadow-lg mx-auto";
                 wrapper.appendChild(cleanCanvas);
                 await initFabricLayerAndParseText(cleanCanvas, pdfPage, viewport);
                 return;
@@ -861,30 +906,26 @@
 
             fCanvas.setBackgroundImage(backingImage, fCanvas.renderAll.bind(fCanvas));
 
-            // Load from cache or extract from scratch
             if (appState.canvasInstances[currentPageNum]) {
                 fCanvas.loadFromJSON(appState.canvasInstances[currentPageNum], () => {
                     fCanvas.renderAll();
                 });
             } else {
-                // Parse and map textual nodes onto editable text assets
                 try {
                     const textContent = await pdfPage.getTextContent();
                     textContent.items.forEach(item => {
                         if (!item.str.trim()) return;
 
-                        // Map coordinates cleanly
                         const [x, y] = viewport.convertToViewportPoint(item.transform[4], item.transform[5]);
                         const fontSize = Math.abs(item.transform[0] || item.transform[3] || 12) * appState.zoomLevel * 1.5;
 
-                        // Create the text element
                         const editableText = new fabric.IText(item.str, {
                             left: x,
-                            top: y - fontSize, // Align to top-left coordinate system
+                            top: y - fontSize, 
                             fontSize: fontSize,
                             fontFamily: 'sans-serif',
-                            fill: document.getElementById('tool-color').value === '#000000' ? '#000000' : document.getElementById('tool-color').value,
-                            backgroundColor: '#ffffff', // Covers the original printed background layer cleanly
+                            fill: '#000000', 
+                            backgroundColor: '#ffffff', // Mask old typography under crisp white bounds
                             borderColor: '#06b6d4',
                             cornerColor: '#06b6d4',
                             transparentCorners: false
@@ -910,12 +951,12 @@
         function setEditMode(mode) {
             appState.editMode = mode;
             document.querySelectorAll('.tool-btn').forEach(el => {
-                el.className = "tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition";
+                el.className = "tool-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition";
             });
 
             const targetBtn = document.getElementById(`tool-${mode}`);
             if (targetBtn) {
-                targetBtn.className = "tool-btn bg-cyan-500 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition";
+                targetBtn.className = "tool-btn bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition";
             }
 
             const fCanvas = getActiveFabricInstance();
@@ -934,7 +975,7 @@
                 fCanvas.freeDrawingBrush.width = activeWidth;
             } else if (mode === 'highlight') {
                 fCanvas.isDrawingMode = true;
-                fCanvas.freeDrawingBrush.color = activeColor + "66"; // Translucent stroke hex code
+                fCanvas.freeDrawingBrush.color = activeColor + "66"; 
                 fCanvas.freeDrawingBrush.width = activeWidth * 2.5;
             } else if (mode === 'text') {
                 const text = new fabric.IText('New Text Layer', {
@@ -982,7 +1023,6 @@
             setEditMode('select');
         }
 
-        // 🖼 INTERACTIVE IMAGE INSERTION TRIGGER MECHANISM
         function triggerImageUpload() {
             document.getElementById('image-loader-input').click();
         }
@@ -998,7 +1038,7 @@
             reader.onload = function(f) {
                 const data = f.target.result;
                 fabric.Image.fromURL(data, function(img) {
-                    img.scaleToWidth(200); // Scale down image file cleanly
+                    img.scaleToWidth(200); 
                     img.set({
                         left: fCanvas.width / 2 - 100,
                         top: fCanvas.height / 2 - 100,
@@ -1451,7 +1491,13 @@
 
         function openKeyboardShortcuts() { document.getElementById('shortcuts-modal').classList.remove('hidden'); }
         function closeKeyboardShortcuts() { document.getElementById('shortcuts-modal').classList.add('hidden'); }
-        function toggleSidebarMobile() { document.querySelector('aside').classList.toggle('hidden'); }
+        
+        // Responsive sidebar controller
+        function toggleSidebarMobile() { 
+            const sidebar = document.getElementById('sidebar-panel');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('flex');
+        }
     </script>
 </body>
 </html>
