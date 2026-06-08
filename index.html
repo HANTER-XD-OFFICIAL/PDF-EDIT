@@ -65,6 +65,12 @@
             box-shadow: 0 0 25px rgba(6, 182, 212, 0.15);
         }
 
+        /* Center Fabric.js elements beautifully inside scrollable div */
+        .canvas-container {
+            margin: 0 auto !important;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+        }
+
         @keyframes float-particle {
             0% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0; }
             10% { opacity: 0.4; }
@@ -498,6 +504,7 @@
                                     <button onclick="setExportRange('selected')" id="btn-range-selected" class="text-slate-400 hover:text-white text-xs px-3 py-1.5 rounded-md font-semibold transition">
                                         Selected Pages Only
                                     </button>
+                                end
                                 </div>
 
                                 <button onclick="executePNGExport()" class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-lg shadow-pink-500/10 flex items-center gap-2 transition duration-300">
@@ -658,6 +665,9 @@
 
         // Immersive Fullscreen Workspace Mode Toggle Engine
         function toggleFullscreenMode() {
+            // Save active changes to temporary state first
+            saveActiveCanvasState();
+
             const sidebar = document.getElementById('sidebar-panel');
             const header = document.getElementById('main-header');
             const footer = document.getElementById('main-footer');
@@ -861,6 +871,9 @@
         async function changeActivePage(pageNum) {
             if (pageNum < 1 || pageNum > appState.totalPages) return;
             
+            // Auto-save changes from currently selected canvas before rendering another page
+            saveActiveCanvasState();
+
             document.querySelectorAll('#thumbnails-container > div').forEach(el => {
                 el.classList.remove('border-cyan-400', 'bg-cyan-950/20');
             });
@@ -885,24 +898,31 @@
             await initFabricLayerAndParseText(activeCanvas, page, viewport);
         }
 
+        // 🛠 FIXED RECURSIVE DIMENSION ALLOCATION: Sets explicit canvas dimensions during recursive resets to fix 0px sizing bug
         async function initFabricLayerAndParseText(targetCanvas, pdfPage, viewport) {
             const wrapper = document.getElementById('workspace-canvas-wrapper');
             const existingContainer = wrapper.querySelector('.canvas-container');
             
             if (existingContainer) {
                 existingContainer.remove();
+                
+                // Recreate target container with explicit pixel boundaries derived directly from viewport
                 const cleanCanvas = document.createElement('canvas');
                 cleanCanvas.id = 'active-pdf-canvas';
                 cleanCanvas.className = "shadow-lg mx-auto";
+                cleanCanvas.width = viewport.width;
+                cleanCanvas.height = viewport.height;
                 wrapper.appendChild(cleanCanvas);
+                
+                // Call parser recursively with safely configured DOM nodes
                 await initFabricLayerAndParseText(cleanCanvas, pdfPage, viewport);
                 return;
             }
 
             const backingImage = targetCanvas.toDataURL("image/png");
             const fCanvas = new fabric.Canvas('active-pdf-canvas', {
-                width: targetCanvas.width,
-                height: targetCanvas.height
+                width: viewport.width,
+                height: viewport.height
             });
 
             fCanvas.setBackgroundImage(backingImage, fCanvas.renderAll.bind(fCanvas));
@@ -926,7 +946,7 @@
                             fontSize: fontSize,
                             fontFamily: 'sans-serif',
                             fill: '#000000', 
-                            backgroundColor: '#ffffff', // Covers underlying text cleanly to avoid overlapping
+                            backgroundColor: '#ffffff', 
                             borderColor: '#06b6d4',
                             cornerColor: '#06b6d4',
                             transparentCorners: false
@@ -947,6 +967,14 @@
             });
 
             setEditMode(appState.editMode);
+        }
+
+        // Saves current state of active Fabric Canvas safely in persistent memory
+        function saveActiveCanvasState() {
+            const activeCanvasInstance = getActiveFabricInstance();
+            if (activeCanvasInstance) {
+                appState.canvasInstances[currentPageNum] = JSON.stringify(activeCanvasInstance.toJSON());
+            }
         }
 
         function setEditMode(mode) {
@@ -979,10 +1007,9 @@
                 fCanvas.freeDrawingBrush.color = activeColor + "66"; 
                 fCanvas.freeDrawingBrush.width = activeWidth * 2.5;
             } else if (mode === 'whiteout') {
-                // Whiteout / Erase tool using a solid white brush
                 fCanvas.isDrawingMode = true;
                 fCanvas.freeDrawingBrush.color = "#ffffff"; 
-                fCanvas.freeDrawingBrush.width = activeWidth * 5; // Extra wide brush for fast erase action
+                fCanvas.freeDrawingBrush.width = activeWidth * 5; 
             } else if (mode === 'text') {
                 const text = new fabric.IText('New Text Layer', {
                     left: fCanvas.width / 2 - 50,
@@ -1139,13 +1166,12 @@
             }
         }
 
-        // 🛠 NEW REDESIGNED FLATTENING ENGINE: Exports absolute FULL HD PDF document sheet layers with ZERO text duplication
         async function compileAndExportPDF() {
             if (!appState.pdfBytes || !appState.pdfLibDoc) return;
             showToast("Compiling Pristine Full HD PDF document...", "info");
             
             try {
-                // Initialize a brand-new clean PDF document template
+                saveActiveCanvasState();
                 const cleanPdfDoc = await PDFLib.PDFDocument.create();
 
                 for (let i = 1; i <= appState.totalPages; i++) {
@@ -1154,17 +1180,15 @@
                     let width, height;
 
                     if (fCanvas && typeof fCanvas === 'object') {
-                        // Render the workspace viewport at high-density (2x zoom) for Full HD resolution
                         const highResDataUrl = fCanvas.toDataURL({
                             format: 'png',
                             quality: 1.0,
-                            multiplier: 2.0 // Ensures ultra-sharp text assets
+                            multiplier: 2.0 
                         });
                         pageImageBytes = await fetch(highResDataUrl).then(res => res.arrayBuffer());
                         width = fCanvas.width / (appState.zoomLevel * 1.5);
                         height = fCanvas.height / (appState.zoomLevel * 1.5);
                     } else if (fCanvas && typeof fCanvas === 'string') {
-                        // Temporarily reconstruct stringified canvas configurations for inactive pages
                         const tempCanvas = document.createElement('canvas');
                         const page = await appState.pdfDoc.getPage(i);
                         const viewport = page.getViewport({ scale: 2.0 }); 
@@ -1189,7 +1213,6 @@
                         height = viewport.height / 2.0;
                         fTempCanvas.dispose();
                     } else {
-                        // Render standard clean original page if there are no modifications
                         const page = await appState.pdfDoc.getPage(i);
                         const viewport = page.getViewport({ scale: 2.0 });
                         const tempCanvas = document.createElement('canvas');
@@ -1205,7 +1228,6 @@
                         height = viewport.height / 2.0;
                     }
 
-                    // Pack the HD canvas frames into our pristine output document
                     const embeddedImage = await cleanPdfDoc.embedPng(pageImageBytes);
                     const newPage = cleanPdfDoc.addPage([width, height]);
                     newPage.drawImage(embeddedImage, {
@@ -1520,9 +1542,11 @@
             }
         }
 
+        // Modal triggers
         function openKeyboardShortcuts() { document.getElementById('shortcuts-modal').classList.remove('hidden'); }
         function closeKeyboardShortcuts() { document.getElementById('shortcuts-modal').classList.add('hidden'); }
         
+        // Mobile Sidebar toggler
         function toggleSidebarMobile() { 
             const sidebar = document.getElementById('sidebar-panel');
             sidebar.classList.toggle('hidden');
