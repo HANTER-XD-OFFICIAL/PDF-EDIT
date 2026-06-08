@@ -635,8 +635,8 @@
 
     <!-- COMPLETE ENGINE JAVASCRIPT LOGIC WORKSPACE -->
     <script>
-        // Set worker endpoint for PDF.js engine safely to prevent cross-origin issues
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        // Set worker endpoint safely. We initialize this properly below.
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
 
         // GLOBAL APPLICATION SYSTEM STATE OBJECT
         let appState = {
@@ -656,8 +656,8 @@
         // UI View Shortcuts Reference Hookup
         let currentPageNum = 1;
 
-        // Initialize Background Particle Floating Animations on Load
-        window.addEventListener('DOMContentLoaded', () => {
+        // Initialize Background Particle Floating Animations & Setup CORS Bypass on Load
+        window.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('particles-container');
             for (let i = 0; i < 15; i++) {
                 const particle = document.createElement('div');
@@ -669,6 +669,19 @@
                 particle.style.animationDelay = `${Math.random() * 12}s`;
                 particle.style.animationDuration = `${Math.random() * 10 + 15}s`;
                 container.appendChild(particle);
+            }
+
+            // 🛠 CORS BYPASS FOR GITHUB PAGES: Fetch and load PDF worker script inside Blob URL
+            try {
+                const workerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                const response = await fetch(workerUrl);
+                const workerBlob = await response.blob();
+                const workerBlobUrl = URL.createObjectURL(workerBlob);
+                pdfjsLib.GlobalWorkerOptions.workerSrc = workerBlobUrl;
+                console.log("PDF.js Worker compiled internally successfully.");
+            } catch (err) {
+                console.warn("Failed to load worker via blob. Falling back to direct script.", err);
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
             }
             
             // Auto fade out transition screen layer
@@ -836,35 +849,45 @@
                 // Read bytes to local ArrayBuffer representation
                 const reader = new FileReader();
                 reader.onload = async function() {
-                    const arrayBuffer = this.result;
-                    appState.pdfBytes = arrayBuffer;
+                    try {
+                        const arrayBuffer = this.result;
+                        appState.pdfBytes = arrayBuffer;
 
-                    // Execute pdf.js and pdf-lib memory loading routines
-                    document.getElementById('editor-progress-bar').style.width = '60%';
-                    appState.pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                    appState.pdfLibDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-                    
-                    appState.totalPages = appState.pdfDoc.numPages;
-                    currentPageNum = 1;
+                        // Execute pdf.js and pdf-lib memory loading routines
+                        document.getElementById('editor-progress-bar').style.width = '60%';
+                        
+                        // 🛠 Uint8Array Conversion to ensure maximum browser stability
+                        const typedArray = new Uint8Array(arrayBuffer);
+                        appState.pdfDoc = await pdfjsLib.getDocument({ data: typedArray }).promise;
+                        appState.pdfLibDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+                        
+                        appState.totalPages = appState.pdfDoc.numPages;
+                        currentPageNum = 1;
 
-                    // Update System Metadata Display Dashboard Badges
-                    document.getElementById('file-size-badge').classList.remove('hidden');
-                    document.getElementById('active-file-size').innerText = formatBytes(file.size);
+                        // Update System Metadata Display Dashboard Badges
+                        document.getElementById('file-size-badge').classList.remove('hidden');
+                        document.getElementById('active-file-size').innerText = formatBytes(file.size);
 
-                    // Render dynamic preview thumbnails list
-                    document.getElementById('editor-progress-bar').style.width = '80%';
-                    await buildEditorThumbnails();
+                        // Render dynamic preview thumbnails list
+                        document.getElementById('editor-progress-bar').style.width = '80%';
+                        await buildEditorThumbnails();
 
-                    // Instantiation workspace active canvas frame render
-                    document.getElementById('editor-progress-bar').style.width = '100%';
-                    setTimeout(() => {
-                        loader.classList.add('hidden');
-                        document.getElementById('editor-workspace').classList.remove('hidden');
-                        document.getElementById('editor-workspace').classList.add('flex');
-                        changeActivePage(1);
-                        saveRecentFileRecord(file.name, file.size);
-                        showToast("Document loaded into Workspace Environment", "success");
-                    }, 400);
+                        // Instantiation workspace active canvas frame render
+                        document.getElementById('editor-progress-bar').style.width = '100%';
+                        setTimeout(() => {
+                            loader.classList.add('hidden');
+                            document.getElementById('editor-workspace').classList.remove('hidden');
+                            document.getElementById('editor-workspace').classList.add('flex');
+                            changeActivePage(1);
+                            saveRecentFileRecord(file.name, file.size);
+                            showToast("Document loaded into Workspace Environment", "success");
+                        }, 400);
+                    } catch (parseError) {
+                        console.error(parseError);
+                        showToast("Error parsing file structure: " + parseError.message, "error");
+                        document.getElementById('drop-zone-editor').classList.remove('hidden');
+                        document.getElementById('editor-loader').classList.add('hidden');
+                    }
                 };
                 reader.readAsArrayBuffer(file);
             } catch (err) {
@@ -1130,7 +1153,9 @@
                 // Export modified layout to local array buffer
                 const pdfBytes = await appState.pdfLibDoc.save();
                 appState.pdfBytes = pdfBytes.buffer;
-                appState.pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes.buffer }).promise;
+
+                const typedArray = new Uint8Array(pdfBytes.buffer);
+                appState.pdfDoc = await pdfjsLib.getDocument({ data: typedArray }).promise;
                 
                 await buildEditorThumbnails();
                 await changeActivePage(currentPageNum);
@@ -1166,7 +1191,9 @@
 
                     const pdfBytes = await appState.pdfLibDoc.save();
                     appState.pdfBytes = pdfBytes.buffer;
-                    appState.pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes.buffer }).promise;
+
+                    const typedArray = new Uint8Array(pdfBytes.buffer);
+                    appState.pdfDoc = await pdfjsLib.getDocument({ data: typedArray }).promise;
 
                     // Relocate pagination structures safely
                     currentPageNum = Math.max(1, currentPageNum - 1);
@@ -1356,21 +1383,30 @@
 
                 const reader = new FileReader();
                 reader.onload = async function() {
-                    const arrayBuffer = this.result;
-                    
-                    appState.pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                    appState.totalPages = appState.pdfDoc.numPages;
-                    appState.selectedExportPages = [];
+                    try {
+                        const arrayBuffer = this.result;
+                        
+                        // 🛠 Uint8Array Safe load for stability
+                        const typedArray = new Uint8Array(arrayBuffer);
+                        appState.pdfDoc = await pdfjsLib.getDocument({ data: typedArray }).promise;
+                        appState.totalPages = appState.pdfDoc.numPages;
+                        appState.selectedExportPages = [];
 
-                    document.getElementById('converter-progress-bar').style.width = '70%';
-                    await buildConverterPageGrid();
+                        document.getElementById('converter-progress-bar').style.width = '70%';
+                        await buildConverterPageGrid();
 
-                    document.getElementById('converter-progress-bar').style.width = '100%';
-                    setTimeout(() => {
-                        loader.classList.add('hidden');
-                        document.getElementById('converter-workspace').classList.remove('hidden');
-                        showToast("Renderer workspace matrices parsed successfully", "success");
-                    }, 400);
+                        document.getElementById('converter-progress-bar').style.width = '100%';
+                        setTimeout(() => {
+                            loader.classList.add('hidden');
+                            document.getElementById('converter-workspace').classList.remove('hidden');
+                            showToast("Renderer workspace matrices parsed successfully", "success");
+                        }, 400);
+                    } catch (parseError) {
+                        console.error(parseError);
+                        showToast("Failed to process file template structure: " + parseError.message, "error");
+                        document.getElementById('drop-zone-converter').classList.remove('hidden');
+                        document.getElementById('converter-loader').classList.add('hidden');
+                    }
                 };
                 reader.readAsArrayBuffer(file);
             } catch (err) {
