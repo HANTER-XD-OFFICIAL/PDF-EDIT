@@ -504,7 +504,6 @@
                                     <button onclick="setExportRange('selected')" id="btn-range-selected" class="text-slate-400 hover:text-white text-xs px-3 py-1.5 rounded-md font-semibold transition">
                                         Selected Pages Only
                                     </button>
-                                end
                                 </div>
 
                                 <button onclick="executePNGExport()" class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-lg shadow-pink-500/10 flex items-center gap-2 transition duration-300">
@@ -665,7 +664,6 @@
 
         // Immersive Fullscreen Workspace Mode Toggle Engine
         function toggleFullscreenMode() {
-            // Save active changes to temporary state first
             saveActiveCanvasState();
 
             const sidebar = document.getElementById('sidebar-panel');
@@ -871,7 +869,6 @@
         async function changeActivePage(pageNum) {
             if (pageNum < 1 || pageNum > appState.totalPages) return;
             
-            // Auto-save changes from currently selected canvas before rendering another page
             saveActiveCanvasState();
 
             document.querySelectorAll('#thumbnails-container > div').forEach(el => {
@@ -898,7 +895,6 @@
             await initFabricLayerAndParseText(activeCanvas, page, viewport);
         }
 
-        // 🛠 FIXED RECURSIVE DIMENSION ALLOCATION: Sets explicit canvas dimensions during recursive resets to fix 0px sizing bug
         async function initFabricLayerAndParseText(targetCanvas, pdfPage, viewport) {
             const wrapper = document.getElementById('workspace-canvas-wrapper');
             const existingContainer = wrapper.querySelector('.canvas-container');
@@ -906,7 +902,6 @@
             if (existingContainer) {
                 existingContainer.remove();
                 
-                // Recreate target container with explicit pixel boundaries derived directly from viewport
                 const cleanCanvas = document.createElement('canvas');
                 cleanCanvas.id = 'active-pdf-canvas';
                 cleanCanvas.className = "shadow-lg mx-auto";
@@ -914,7 +909,6 @@
                 cleanCanvas.height = viewport.height;
                 wrapper.appendChild(cleanCanvas);
                 
-                // Call parser recursively with safely configured DOM nodes
                 await initFabricLayerAndParseText(cleanCanvas, pdfPage, viewport);
                 return;
             }
@@ -969,7 +963,6 @@
             setEditMode(appState.editMode);
         }
 
-        // Saves current state of active Fabric Canvas safely in persistent memory
         function saveActiveCanvasState() {
             const activeCanvasInstance = getActiveFabricInstance();
             if (activeCanvasInstance) {
@@ -1166,6 +1159,25 @@
             }
         }
 
+        // 🛠 NEW ULTRA-STABLE DUAL-LAYER DOWNLOAD TRIGGER: Bypasses standard mobile web-view download blockages
+        function triggerFileDownload(blob, filename) {
+            try {
+                // Try FileSaver.js implementation first
+                saveAs(blob, filename);
+            } catch (e) {
+                console.warn("FileSaver failed, switching to native anchor link element fallback.", e);
+                // HTML5 Anchor DOM injection fallback for Chrome Mobile / WebView
+                const blobUrl = URL.createObjectURL(blob);
+                const downloadLink = document.createElement('a');
+                downloadLink.href = blobUrl;
+                downloadLink.download = filename;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                URL.revokeObjectURL(blobUrl);
+            }
+        }
+
         async function compileAndExportPDF() {
             if (!appState.pdfBytes || !appState.pdfLibDoc) return;
             showToast("Compiling Pristine Full HD PDF document...", "info");
@@ -1241,8 +1253,9 @@
                 const finalPdfBytes = await cleanPdfDoc.save();
                 const blob = new Blob([finalPdfBytes], { type: "application/pdf" });
                 const outName = appState.currentFileMetadata.name.replace(".pdf", "_edited_rasel.pdf");
-                saveAs(blob, outName);
                 
+                // Trigger download through our secure dual-layer download engine
+                triggerFileDownload(blob, outName);
                 showToast("Full HD Document successfully compiled with ZERO overlaps!", "success");
             } catch (err) {
                 console.error(err);
@@ -1476,7 +1489,9 @@
                 }
 
                 const content = await zip.generateAsync({ type: "blob" });
-                saveAs(content, "MD_RASEL_PNG_PACK.zip");
+                
+                // Trigger download through our secure dual-layer download engine
+                triggerFileDownload(content, "MD_RASEL_PNG_PACK.zip");
                 showToast("Images converted and zipped!", "success");
             } catch (err) {
                 showToast("Conversion failed: " + err.message, "error");
@@ -1542,11 +1557,9 @@
             }
         }
 
-        // Modal triggers
         function openKeyboardShortcuts() { document.getElementById('shortcuts-modal').classList.remove('hidden'); }
         function closeKeyboardShortcuts() { document.getElementById('shortcuts-modal').classList.add('hidden'); }
         
-        // Mobile Sidebar toggler
         function toggleSidebarMobile() { 
             const sidebar = document.getElementById('sidebar-panel');
             sidebar.classList.toggle('hidden');
